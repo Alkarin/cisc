@@ -52,14 +52,12 @@ int main(int argc, char* argv[]){
 
     #define PI 3.14159265
 
-    // get points
-    // print output from commandline
-    // for loop to print all args
+    // for loop to print all input args
     for (int i = 0; i < argc; i++){
-        // maybe do i+1 to avoid program arg
         printf("command line was %s\n", argv[i]);
+        // get points
         if(i == 0){
-            // skip arg
+            // skip inital arg
         } else if(i == 1){
             sscanf(argv[i],"%lf", &lat1);
         } else if(i == 2) {
@@ -74,11 +72,6 @@ int main(int argc, char* argv[]){
     //print argc
     //int argc is number of arguments on commandline (a 123 123 = 3 args)
     printf("argc: %d \n", argc);
-
-    //double  lat1 = -99.9;
-    //double  long1 = 99.8;
-    //double  lat2 = 99.7;
-    //double  long2 = -99.6;
 
     struct geoLocation point1;
     struct geoLocation point2;
