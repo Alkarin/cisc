@@ -35,7 +35,6 @@ struct geoLocation{
 double calculateDistance(double lat1, double long1, double lat2, double long2);
 void printResult(struct geoLocation, struct geoLocation, double result);
 double distanceBetween(struct geoLocation one, struct geoLocation two);
-double kilometerToYards(double kilometers);
 double toRadians(double degree);
 
 int main(int argc, char* argv[]){
@@ -91,8 +90,6 @@ double calculateDistance(double lat1, double long1, double lat2, double long2){
 
     // radious of earth in miles
     double RadiusMi = 3963.1676;
-    // radius of earth in kilometers
-    double RadiusKm = 6371;
 
     // midpoint formula
     double dlong = (long2 - long1);
@@ -103,10 +100,10 @@ double calculateDistance(double lat1, double long1, double lat2, double long2){
     double c = 2 * atan2(sqrt(a), sqrt(1-a));
 
     // result
-    double result = RadiusKm * c;
+    double result = RadiusMi * c;
     // convert to yards
-    result = kilometerToYards(result);
-    return result;
+    //result = kilometerToYards(result);
+    return result * 1760;
 }
 
 double toRadians(double degree){
@@ -121,13 +118,8 @@ double toRadians(double degree){
     return degree * (M_PI/180.00);
 }
 
-double kilometerToYards(double kilometers){
-    // convert kilometers to yards
-    return kilometers * 1093.6;
-}
-
 void printResult(struct geoLocation one, struct geoLocation two, double result){
-    printf("The distance between points (%lf , %lf) and (%lf, %lf) is %lf yards. \n", one.latitude, one.longitude, two.latitude, two.longitude, result);
+    printf("The distance between points (%lf, %lf) and (%lf, %lf) is %.2lf yards. \n", one.latitude, one.longitude, two.latitude, two.longitude, result);
 }
 
 
