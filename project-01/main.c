@@ -116,7 +116,8 @@ double calculateDistance(double lat1, double long1, double lat2, double long2){
 
     // result
     double result = RadiusKm * c;
-    // result = kilometerToYards(result);
+    // convert to yards
+    result = kilometerToYards(result);
     return result;
 }
 
