@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-/* 
+/*
 ############# PROJECT INFO #############
 cplusplus.com
 C library reference, has list of all includes
@@ -25,69 +25,61 @@ Various links
 // no error checking for arg input, assume correct input
 */
 
-double distanceBetween(double lat1, double long1, double lat2, double long2);
-double toRadians(double degree);
-double calculateDistance(double lat1, double long1, double lat2, double long2);
-double kilometerToYards(double kilometers);
-
-// make a struct
-// an array of structs
+// struct declarations
 struct geoLocation{
     double latitude;
     double longitude;
 };
 
+// method declarations
+double calculateDistance(double lat1, double long1, double lat2, double long2);
+void printResult(struct geoLocation, struct geoLocation, double result);
+double distanceBetween(struct geoLocation one, struct geoLocation two);
+double kilometerToYards(double kilometers);
+double toRadians(double degree);
+
 int main(int argc, char* argv[]){
 
-    double  lat1;
-    double  long1;
-    double  lat2;
-    double  long2;
+    struct geoLocation point1;
+    struct geoLocation point2;
 
-    // for loop to print all input args
+    // for loop to assign args to geoLocations
     for (int i = 0; i < argc; i++){
-        printf("command line was %s\n", argv[i]);
+
+        // DEBUG
+        //printf("command line was %s\n", argv[i]);
+
         // get points
         if(i == 0){
             // skip inital arg
         } else if(i == 1){
-            sscanf(argv[i],"%lf", &lat1);
+            sscanf(argv[i],"%lf", &point1.latitude);
         } else if(i == 2) {
-            sscanf(argv[i],"%lf", &long1);
+            sscanf(argv[i],"%lf", &point1.longitude);
         } else if(i == 3) {
-            sscanf(argv[i],"%lf", &lat2);
+            sscanf(argv[i],"%lf", &point2.latitude);
         } else if(i == 4) {
-            sscanf(argv[i],"%lf", &long2);
+            sscanf(argv[i],"%lf", &point2.longitude);
         }
     }
 
-    //print argc
-    //int argc is number of arguments on commandline (a 123 123 = 3 args)
-    printf("argc: %d \n", argc);
+    // calculate distance
+    double result = distanceBetween(point1,point2);
 
-    struct geoLocation point1;
-    struct geoLocation point2;
-    point1.latitude = lat1;
-    point1.longitude = long1;
-    point2.latitude = lat2;
-    point2.longitude = long2;
-
-    //get args from command line
-    double result = distanceBetween(lat1,long1,lat2,long2);
-
-    printf("The distance between points (%lf , %lf) and (%lf, %lf) is %lf yards. \n", lat1, long1, lat2, long2, result);
+    // print result
+    printResult(point1,point2,result);
 
     return 0;
 }
 
-double distanceBetween(double lat1, double long1, double lat2, double long2){
+double distanceBetween(struct geoLocation one, struct geoLocation two){
 
     // convert to radians
-    lat1 = toRadians(lat1);
-    long1 = toRadians(long1);
+    double lat1 = toRadians(one.latitude);
+    double long1 = toRadians(one.longitude);
 
-    lat2 = toRadians(lat2);
-    long2 = toRadians(long2);
+    double lat2 = toRadians(two.latitude);
+    double long2 = toRadians(two.longitude);
 
     // calculate distance points
     double distance = calculateDistance(lat1,long1,lat2,long2);
@@ -100,7 +92,10 @@ double toRadians(double degree){
     // multiply coordindate in degrees by pi/180 to get radians
     // ex:90 degrees
     // 90 * PI/180 = PI/2 ~ 1.57096
-    printf("%lf in radians is %lf \n", degree, degree * (M_PI/180.00) );
+
+    //DEBUG
+    //printf("%lf in radians is %lf \n", degree, degree * (M_PI/180.00) );
+
     return degree * (M_PI/180.00);
 }
 
@@ -128,6 +123,10 @@ double calculateDistance(double lat1, double long1, double lat2, double long2){
 double kilometerToYards(double kilometers){
     // convert kilometers to yards
     return kilometers * 1093.6;
+}
+
+void printResult(struct geoLocation one, struct geoLocation two, double result){
+    printf("The distance between points (%lf , %lf) and (%lf, %lf) is %lf yards. \n", one.latitude, one.longitude, two.latitude, two.longitude, result);
 }
 
 
