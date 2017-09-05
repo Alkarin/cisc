@@ -87,18 +87,6 @@ double distanceBetween(struct geoLocation one, struct geoLocation two){
     return distance;
 }
 
-double toRadians(double degree){
-
-    // multiply coordindate in degrees by pi/180 to get radians
-    // ex:90 degrees
-    // 90 * PI/180 = PI/2 ~ 1.57096
-
-    //DEBUG
-    //printf("%lf in radians is %lf \n", degree, degree * (M_PI/180.00) );
-
-    return degree * (M_PI/180.00);
-}
-
 double calculateDistance(double lat1, double long1, double lat2, double long2){
 
     // radious of earth in miles
@@ -119,6 +107,18 @@ double calculateDistance(double lat1, double long1, double lat2, double long2){
     // convert to yards
     result = kilometerToYards(result);
     return result;
+}
+
+double toRadians(double degree){
+
+    // multiply coordindate in degrees by pi/180 to get radians
+    // ex:90 degrees
+    // 90 * PI/180 = PI/2 ~ 1.57096
+
+    //DEBUG
+    //printf("%lf in radians is %lf \n", degree, degree * (M_PI/180.00) );
+
+    return degree * (M_PI/180.00);
 }
 
 double kilometerToYards(double kilometers){
