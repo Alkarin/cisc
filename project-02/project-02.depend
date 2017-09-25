@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1506380243 source:/home/alexander/Documents/MATH230/projects/project-02/main.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<string.h>
+
