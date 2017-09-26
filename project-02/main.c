@@ -19,7 +19,6 @@ http://www.movable-type.co.uk/scripts/latlong.html
 
 Various links
 // https://swccd.instructure.com/courses/6682/assignments/31434
-
 // http://www.cplusplus.com/reference/cmath/cos/
 */
 
@@ -34,10 +33,8 @@ struct latLong {
 
 // method declarations
 double calculateDistance(double lat1, double long1, double lat2, double long2);
-void printResult(struct latLong, struct latLong, double result);
 double distanceBetween(struct latLong one, struct latLong two);
 double toRadians(double degree);
-
 void  printClosest(struct latLong*  head, struct latLong  myLocation);
 
 #define MAX_LENGTH 1048576
@@ -49,7 +46,6 @@ int main(int argc, char* argv[]){
     myLocation.longitude = -117.234949;
 
     //linked list node setup
-
     link temp,node,head;
     temp = malloc(sizeof(struct latLong));
     head = temp;
@@ -63,7 +59,6 @@ int main(int argc, char* argv[]){
     char *longitude;
 
     FILE* input = fopen(argv[1],"r"); // "r" for read
-
 
     if(input == NULL){
         // appropriate args not found
@@ -91,7 +86,7 @@ int main(int argc, char* argv[]){
 
         node->next = NULL;
 
-        //TODO: first node is showing up uninitialized
+        //TODO: first node is uninitialized
         //printAll(head);
 
         printClosest(head,myLocation);
@@ -167,22 +162,19 @@ double toRadians(double degree){
     return degree * (M_PI/180.00);
 }
 
-void printResult(struct latLong one, struct latLong two, double result){
-    printf("The distance between points (%lf, %lf) and (%lf, %lf) is %.2lf yards. \n", one.latitude, one.longitude, two.latitude, two.longitude, result);
-}
-
 void  printClosest(struct latLong*  head, struct latLong  myLocation){
-
-
-
-    //get array of results with their associated coordinate
-    //return lat/long of shorts distance
 
     //skips uninitialized node
     head=head->next;
     printf("\n");
 
+    //array size
     int i = 0;
+
+    //distance between coordinates
+    double result;
+
+    //get array of results with their associated coordinate
     double distance[linkedListLength(head)];
     struct latLong coordinates[linkedListLength(head)];
 
@@ -190,52 +182,36 @@ void  printClosest(struct latLong*  head, struct latLong  myLocation){
         return;
     } else if(head->next==NULL){
         // calculate distance
-        double result = distanceBetween(*head,myLocation);
-        printResult(*head,myLocation,result);
-
+        result = distanceBetween(*head,myLocation);
         distance[i] = result;
         coordinates[i] = *head;
         i++;
-
         printf("End\n");
     } else while(head!=NULL){
         // calculate distance
-        double result = distanceBetween(*head,myLocation);
+        result = distanceBetween(*head,myLocation);
 
+        // place results in array
         distance[i] = result;
         coordinates[i] = *head;
-        i++;
 
-        printResult(*head,myLocation,result);
-        printf("\n");
+        //increment array size
+        i++;
         head=head->next;
     }
 
-    compareDistance(distance,coordinates,i);
+    printResult(distance,coordinates,i);
     return;
 
 }
 
-void compareDistance(double distance[],struct latLong coordinates[],int arraySize){
+void printResult(double distance[],struct latLong coordinates[],int arraySize){
 
+    //which array index to pull closest distance and its associated coordinates
     int index = findShortestDistance(distance,arraySize);
 
-    printf("index: %d \n", index);
-    printf("Shortest distance: %lf \n", distance[index]);
-    printf("lat: %lf \n", coordinates[index].latitude);
-    printf("lng: %lf \n", coordinates[index].longitude);
+    printf("latLong: (%lf,%lf) is the closest distance at %.02lf yards.", coordinates[index].latitude, coordinates[index].longitude, distance[index]);
 
-}
-
-int linkedListLength(struct latLong* head)
-{
-    int num = 0;
-    while (head != NULL)
-    {
-        num += 1;
-        head = head->next;
-    }
-    return num;
 }
 
 int findShortestDistance(double a[], int n) {
@@ -254,6 +230,16 @@ int findShortestDistance(double a[], int n) {
   return index;
 }
 
+int linkedListLength(struct latLong* head)
+{
+    int num = 0;
+    while (head != NULL)
+    {
+        num += 1;
+        head = head->next;
+    }
+    return num;
+}
 
 
 
