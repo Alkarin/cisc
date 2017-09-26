@@ -220,10 +220,10 @@ void compareDistance(double distance[],struct latLong coordinates[],int arraySiz
 
     int index = findShortestDistance(distance,arraySize);
 
+    printf("index: %d \n", index);
     printf("Shortest distance: %lf \n", distance[index]);
-    // these are just displaying distance[index] ?
-    printf("lat: %lf \n", &coordinates[index].latitude);
-    printf("lng: %lf \n", &coordinates[index].longitude);
+    printf("lat: %lf \n", coordinates[index].latitude);
+    printf("lng: %lf \n", coordinates[index].longitude);
 
 }
 
@@ -245,7 +245,7 @@ int findShortestDistance(double a[], int n) {
   min = a[0];
   index = 0;
 
-  for (c = 1; c < n; c++) {
+  for (c = 0; c < n; c++) {
     if (a[c] < min) {
        index = c;
        min = a[c];
