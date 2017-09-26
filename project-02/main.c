@@ -24,25 +24,18 @@ Various links
 */
 
 // struct declarations
-struct geoLocation{
-    double latitude;
-    double longitude;
-};
-
 typedef struct latLong* link;
 
 struct latLong {
-  double lat;
-  double lng;
+  double latitude;
+  double longitude;
   link next;
 };
 
-
-
 // method declarations
 double calculateDistance(double lat1, double long1, double lat2, double long2);
-void printResult(struct geoLocation, struct geoLocation, double result);
-double distanceBetween(struct geoLocation one, struct geoLocation two);
+void printResult(struct latLong, struct latLong, double result);
+double distanceBetween(struct latLong one, struct latLong two);
 double toRadians(double degree);
 
 void  printClosest(struct latLong*  head, struct latLong  myLocation);
@@ -52,16 +45,20 @@ int main(int argc, char* argv[]){
 
     // barefoot solutions
     struct latLong  myLocation;
-    myLocation.lat = 32.800419;
-    myLocation.lng = -117.234949;
+    myLocation.latitude = 32.800419;
+    myLocation.longitude = -117.234949;
+
+    //linked list node setup
 
     link temp,node,head;
     temp = malloc(sizeof(struct latLong));
     head = temp;
     node = temp;
 
+    //commandline line
     char line[MAX_LENGTH];
 
+    //temporary values read from commandline
     char *latitude;
     char *longitude;
 
@@ -69,92 +66,61 @@ int main(int argc, char* argv[]){
 
 
     if(input == NULL){
+        // appropriate args not found
         printf("%s","No such file\n");
         exit(1);
     } else {
+        // read args from file and build linked list
         while(fgets(line, 1000, input) != NULL){
 
-            printf("Input was: %s \n", line);
+            //printf("Input was: %s \n", line);
 
             latitude = strtok(line, ",");
             longitude = strtok(NULL, "");
 
-            printf("token1: %s \n", latitude);
-            printf("token2: %s \n", longitude);
+            //printf("token1: %s \n", latitude);
+            //printf("token2: %s \n", longitude);
 
             node->next = malloc(sizeof(*node));
             node = node->next;
-            node->lat = atof(latitude);
-            node->lng = atof(longitude);
+            node->latitude = atof(latitude);
+            node->longitude = atof(longitude);
         }
 
         fclose(input);
 
         node->next = NULL;
-        //first node is showing up empty?
-        printAll(head);
+
+        //TODO: first node is showing up uninitialized
+        //printAll(head);
 
         printClosest(head,myLocation);
 
-        //
     }
-
-/*
-    struct geoLocation point1;
-    struct geoLocation point2;
-
-    // for loop to assign args to geoLocations
-    for (int i = 0; i < argc; i++){
-
-        // DEBUG
-        //printf("command line was %s\n", argv[i]);
-
-        // get points
-        if(i == 0){
-            // skip inital arg
-        } else if(i == 1){
-            sscanf(argv[i],"%lf", &point1.latitude);
-        } else if(i == 2) {
-            sscanf(argv[i],"%lf", &point1.longitude);
-        } else if(i == 3) {
-            sscanf(argv[i],"%lf", &point2.latitude);
-        } else if(i == 4) {
-            sscanf(argv[i],"%lf", &point2.longitude);
-        }
-    }
-
-    // calculate distance
-    double result = distanceBetween(point1,point2);
-
-    // print result
-    printResult(point1,point2,result);
-*/
     return 0;
 }
 
-
-
 void printAll( link x){
-    //Skips first empty node
+    //skips uninitialized node
     x=x->next;
 
     printf("\n");
     if(x==NULL){
         return;
     } else if(x->next==NULL){
-        printf("lat: %f \n", x->lat);
-        printf("lng: %f \n", x->lng);
+        printf("latitude: %f \n", x->latitude);
+        printf("longitude: %f \n", x->longitude);
         printf("End\n");
     } else while(x!=NULL){
-        printf("lat: %f \n", x->lat);
-        printf("lng: %f \n", x->lng);
+        printf("latitude: %f \n", x->latitude);
+        printf("longitude: %f \n", x->longitude);
         printf("\n");
         x=x->next;
     }
     return;
 }
 
-double distanceBetween(struct geoLocation one, struct geoLocation two){
+double distanceBetween(struct latLong one, struct latLong two){
 
     // convert to radians
     double lat1 = toRadians(one.latitude);
@@ -201,14 +167,93 @@ double toRadians(double degree){
     return degree * (M_PI/180.00);
 }
 
-void printResult(struct geoLocation one, struct geoLocation two, double result){
+void printResult(struct latLong one, struct latLong two, double result){
     printf("The distance between points (%lf, %lf) and (%lf, %lf) is %.2lf yards. \n", one.latitude, one.longitude, two.latitude, two.longitude, result);
 }
 
 void  printClosest(struct latLong*  head, struct latLong  myLocation){
-    printf("myLoc lat: %f \n", myLocation.lat);
-    printf("myLoc lng: %f \n", myLocation.lng);
+
+
+
+    //get array of results with their associated coordinate
+    //return lat/long of shorts distance
+
+    //skips uninitialized node
+    head=head->next;
+    printf("\n");
+
+    int i = 0;
+    double distance[linkedListLength(head)];
+    struct latLong coordinates[linkedListLength(head)];
+
+    if(head==NULL){
+        return;
+    } else if(head->next==NULL){
+        // calculate distance
+        double result = distanceBetween(*head,myLocation);
+        printResult(*head,myLocation,result);
+
+        distance[i] = result;
+        coordinates[i] = *head;
+        i++;
+
+        printf("End\n");
+    } else while(head!=NULL){
+        // calculate distance
+        double result = distanceBetween(*head,myLocation);
+
+        distance[i] = result;
+        coordinates[i] = *head;
+        i++;
+
+        printResult(*head,myLocation,result);
+        printf("\n");
+        head=head->next;
+    }
+
+    compareDistance(distance,coordinates,i);
+    return;
+
 }
+
+void compareDistance(double distance[],struct latLong coordinates[],int arraySize){
+
+    int index = findShortestDistance(distance,arraySize);
+
+    printf("Shortest distance: %lf \n", distance[index]);
+    // these are just displaying distance[index] ?
+    printf("lat: %lf \n", &coordinates[index].latitude);
+    printf("lng: %lf \n", &coordinates[index].longitude);
+
+}
+
+int linkedListLength(struct latLong* head)
+{
+    int num = 0;
+    while (head != NULL)
+    {
+        num += 1;
+        head = head->next;
+    }
+    return num;
+}
+
+int findShortestDistance(double a[], int n) {
+  int c, index;
+  double min;
+
+  min = a[0];
+  index = 0;
+
+  for (c = 1; c < n; c++) {
+    if (a[c] < min) {
+       index = c;
+       min = a[c];
+    }
+  }
+  return index;
+}
+
 
 
 
