@@ -42,8 +42,6 @@ int main(int argc, char* argv[]){
 
     // barefoot solutions
     struct latLong  myLocation;
-    myLocation.latitude = 32.800419;
-    myLocation.longitude = -117.234949;
 
     //linked list node setup
     link temp,node,head;
@@ -65,21 +63,24 @@ int main(int argc, char* argv[]){
         printf("%s","No such file\n");
         exit(1);
     } else {
+        // ensure first line populates myLocation
+        int lineNumber = 1;
         // read args from file and build linked list
         while(fgets(line, 1000, input) != NULL){
-
-            //printf("Input was: %s \n", line);
 
             latitude = strtok(line, ",");
             longitude = strtok(NULL, "");
 
-            //printf("token1: %s \n", latitude);
-            //printf("token2: %s \n", longitude);
-
-            node->next = malloc(sizeof(*node));
-            node = node->next;
-            node->latitude = atof(latitude);
-            node->longitude = atof(longitude);
+            if(lineNumber==1){
+                myLocation.latitude = atof(latitude);
+                myLocation.longitude = atof(longitude);
+            } else {
+                node->next = malloc(sizeof(*node));
+                node = node->next;
+                node->latitude = atof(latitude);
+                node->longitude = atof(longitude);
+            }
+            lineNumber++;
         }
 
         fclose(input);
@@ -208,30 +209,36 @@ void  printClosest(struct latLong*  head, struct latLong  myLocation){
 void printResult(double distance[],struct latLong coordinates[],int arraySize){
 
     //which array index to pull closest distance and its associated coordinates
-    int index = findShortestDistance(distance,arraySize);
+    int index = shortestDistanceIndex(distance,arraySize);
 
-    printf("latLong: (%lf,%lf) is the closest distance at %.02lf yards.", coordinates[index].latitude, coordinates[index].longitude, distance[index]);
+    //printf("latLong: (%lf,%lf) is the closest distance at %.02lf yards \n", coordinates[index].latitude, coordinates[index].longitude, distance[index]);
+    printf("The location closest to the first point is at: %lf,%lf\n", coordinates[index].latitude, coordinates[index].longitude);
 
 }
 
-int findShortestDistance(double a[], int n) {
+int shortestDistanceIndex(double a[], int n) {
   int c, index;
   double min;
 
+  // use first index as default min
   min = a[0];
   index = 0;
 
+  // compare shortest distance to current value
   for (c = 0; c < n; c++) {
     if (a[c] < min) {
        index = c;
        min = a[c];
     }
   }
+
+  // returns index of the shortest distance
   return index;
 }
 
 int linkedListLength(struct latLong* head)
 {
+    //walks linked list and returns number of links
     int num = 0;
     while (head != NULL)
     {
