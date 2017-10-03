@@ -58,6 +58,7 @@ struct instructionSet {
 };
 // method declarations
 int convertHexAsciiValueToDecimal(char c);
+void printIntArray(int array[], int arraySize);
 
 #define MAX_LENGTH 1048576
 int main(int argc, char* argv[]){
@@ -125,10 +126,15 @@ void printAll( link x){
 void convertToBinary(char* machineCode){
 
     int i;
+    int digits[strlen(machineCode)];
     for (i = 0; i < strlen(machineCode); i++){
         int result = convertHexAsciiValueToDecimal(machineCode[i]);
-        printf("Value: %d \n", result);
+        printf("value: %d \n", result);
+        digits[i] = result;
     }
+
+
+    printIntArray(digits,i);
 }
 
 int convertHexAsciiValueToDecimal(char c){
@@ -164,6 +170,13 @@ int convertDecimalToBinary(int decimal){
         i = i*10;
     }
     return binary;
+}
+
+void printIntArray(int array[], int arraySize){
+    int i;
+    for (i=0; i < arraySize-1 ;i++) {
+        printf("%d",array[i]);
+    }
 }
 
 
