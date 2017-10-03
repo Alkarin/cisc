@@ -133,8 +133,14 @@ void convertToBinary(char* machineCode){
         digits[i] = result;
     }
 
+    for (i = 0; i < strlen(machineCode); i++){
+        int result = convertDecimalToBinary(digits[i]);
+        printf(" binary value: %d \n", result);
+        digits[i] = result;
+    }
 
-    printIntArray(digits,i);
+
+    printIntArray(digits,i-1);
 }
 
 int convertHexAsciiValueToDecimal(char c){
@@ -160,6 +166,11 @@ int convertHexAsciiValueToDecimal(char c){
 }
 
 int convertDecimalToBinary(int decimal){
+
+    //need to check most significant bit if 1 or 0
+    // also check total num of digits
+    // if numDigits < 4 add digits according to sigBit
+
         int remainder;
         int binary = 0, i = 1;
 
@@ -174,7 +185,7 @@ int convertDecimalToBinary(int decimal){
 
 void printIntArray(int array[], int arraySize){
     int i;
-    for (i=0; i < arraySize-1 ;i++) {
+    for (i=0; i < arraySize; i++) {
         printf("%d",array[i]);
     }
 }
