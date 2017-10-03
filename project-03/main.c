@@ -70,6 +70,7 @@ struct instructionSet {
 };
 // method declarations
 char* convertHexToBinary(char hex[]);
+char integerToHex(int integer);
 void printIntArray(int array[], int arraySize);
 
 //typedef short int16_t
@@ -131,11 +132,126 @@ void printAll( link x){
     } else while(x!=NULL){
         printf("machineCode: %s", x->machineCode);
         printf("Binary number: %s \n", x->binary);
-        printf("Opcode: %d \n", x->opcode);
+        printf("Opcode: %c \n", integerToHex(x->opcode));
         printf("\n");
         x=x->next;
     }
     return;
+}
+
+void printIntArray(int array[], int arraySize){
+    int i;
+    for (i=0; i < arraySize; i++) {
+        printf("%d",array[i]);
+    }
+}
+
+getOpcode(char binary[32]){
+    // return hex number
+    char opCode[6];
+    // analyse first 6 bits to determine opcode
+    for(int i = 0; i < 6; i++){
+        opCode[i] = binary[i];
+
+    }
+
+    //printf("opcode: %d", binaryToInteger(opCode));
+
+    return binaryToInteger(opCode);
+}
+
+getFunc(){
+    // return func hex
+}
+
+getMIPS(){
+    // return operation (addiu, ori, lui, add etc)
+}
+
+getFormat(){
+    // return "I" or "R"
+}
+
+getRD(){
+    //return hex of RD
+}
+
+getRS(){
+    // return hex of RS
+}
+
+getRT(){
+    // return hex of RT
+}
+
+getImm(){
+    // return Immediate value
+    //which is last 4 digits of machineCode
+    // IE: 24020004 = 0044
+}
+
+int binaryToInteger(const char *s){
+  return (int) strtol(s, NULL, 2);
+}
+
+char integerToHex(int integer){
+    char result;
+    printf("integer: %d \n", integer);
+    switch(integer){
+        case 0:
+            result = '0';
+            return result;
+        case 1:
+            result = '1';
+            return result;
+        case 2:
+            result = '2';
+            return result;
+        case 3:
+            result = '3';
+            return result;
+        case 4:
+            result = '4';
+            return result;
+        case 5:
+            result = '5';
+            return result;
+        case 6:
+            result = '6';
+            return result;
+        case 7:
+            result = '7';
+            return result;
+        case 8:
+            result = '8';
+            return result;
+        case 9:
+            result = '9';
+            return result;
+        case 10:
+            result = 'a';
+            return result;
+        case 11:
+            result = 'b';
+            return result;
+        case 12:
+            result = 'c';
+            return result;
+        case 13:
+            result = 'd';
+            return result;
+        case 14:
+            result = 'e';
+            return result;
+        case 15:
+            result = 'f';
+            return result;
+        default:
+            // NOT A HEX VALUE
+            result = 'x';
+            return result;
+            break;
+    }
 }
 
 char* convertHexToBinary(char* hex){
@@ -148,10 +264,8 @@ char* convertHexToBinary(char* hex){
     binaryInstruction[0] = '\0';
 
     // extract each hex digit and convert to 16bit binary
-    for(i=0; hex[i]!='\0'; i++)
-    {
-        switch(hex[i])
-        {
+    for(i=0; hex[i]!='\0'; i++){
+        switch(hex[i]){
             case '0':
                 strcat(binaryInstruction, "0000");
                 break;
@@ -216,59 +330,3 @@ char* convertHexToBinary(char* hex){
     return binaryInstruction;
 
 }
-
-void printIntArray(int array[], int arraySize){
-    int i;
-    for (i=0; i < arraySize; i++) {
-        printf("%d",array[i]);
-    }
-}
-
-getOpcode(char binary[32]){
-    // return hex number
-    char opCode[6];
-    // analyse first 6 bits to determine opcode
-    for(int i = 0; i < 6; i++){
-        opCode[i] = binary[i];
-
-    }
-
-    //printf("opcode: %d", binaryToInteger(opCode));
-
-    return binaryToInteger(opCode);
-}
-
-getFunc(){
-    // return func hex
-}
-
-getMIPS(){
-    // return operation (addiu, ori, lui, add etc)
-}
-
-getFormat(){
-    // return "I" or "R"
-}
-
-getRD(){
-    //return hex of RD
-}
-
-getRS(){
-    // return hex of RS
-}
-
-getRT(){
-    // return hex of RT
-}
-
-getImm(){
-    // return Immediate value
-    //which is last 4 digits of machineCode
-    // IE: 24020004 = 0044
-}
-
-int binaryToInteger(const char *s){
-  return (int) strtol(s, NULL, 2);
-}
-
