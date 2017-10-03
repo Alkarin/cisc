@@ -89,8 +89,6 @@ int main(int argc, char* argv[]){
     //commandline line
     char line[MAX_LENGTH];
 
-    char *tempHex;
-
     //open file from commandline
     FILE* input = fopen(argv[1],"r"); // "r" for read
 
@@ -107,12 +105,9 @@ int main(int argc, char* argv[]){
             node->next = malloc(sizeof(*node));
             node = node->next;
 
-            //tempHex = (char *) malloc(sizeof(char) * 32);
-            tempHex = convertHexToBinary(line);
-
             // assign to current node
             strcpy(node->machineCode, line);
-            strcpy(node->binary, tempHex);
+            strcpy(node->binary, convertHexToBinary(line));
         }
     }
 
