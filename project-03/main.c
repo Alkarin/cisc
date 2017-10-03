@@ -36,22 +36,32 @@ print result
 */
 
 
-
 // struct declarations
 typedef struct instructionSet* link;
 
 struct instructionSet {
-  char machineCode[32];
-  int binary;
+
+  // initial hex instruction
+  char* machineCode[8];
+  // instruction converted to 32bit binary
+  char binary[32];
+
+  int binaryAsNum;
   //hex
   int opcode;
   //hex
   int func;
+
   int instruction;
+
   char Format;
+
   int rd;
+
   int rs;
+
   int rt;
+
   //hex
   int Imm;
 
@@ -89,10 +99,20 @@ int main(int argc, char* argv[]){
         while(fgets(line, 1000, input) != NULL){
             printf("%s \n", line);
 
+            // allocate memory for next node
             node->next = malloc(sizeof(*node));
             node = node->next;
+
+            //tempHex = (char *) malloc(sizeof(char) * 32);
             tempHex = convertHexToBinary(line);
-            strcpy(node->machineCode, &tempHex);
+            printf("temphex: %s \n", tempHex);
+
+
+            strcpy(node->machineCode, line);
+            strcpy(node->binary, &tempHex);
+
+            printf("machineCode: %s \n", node->machineCode);
+            printf("Binary number: %s \n", node->binary);
 
         }
     }
@@ -100,7 +120,7 @@ int main(int argc, char* argv[]){
     fclose(input);
     node->next = NULL;
 
-    //printAll(head);
+    printAll(head);
 
     return 0;
 }
@@ -113,12 +133,13 @@ void printAll( link x){
     if(x==NULL){
         return;
     } else if(x->next==NULL){
-        printf("machineCode: %s \n", x->machineCode);
+        printf("machineCode2: %s \n", x->machineCode);
+        printf("Binary number2: %s \n", x->binary);
 
         printf("End\n");
     } else while(x!=NULL){
-        printf("machineCode: %s \n", x->machineCode);
-        convertHexToBinary(x->machineCode);
+        printf("machineCode2: %s \n", x->machineCode);
+        printf("Binary number2: %s \n", x->binary);
         printf("\n");
         x=x->next;
     }
@@ -129,7 +150,7 @@ char* convertHexToBinary(char* hex){
 
     int i =0;
     // create new char array with size for 4bit digits
-    char binaryInstruction[32];
+    char* binaryInstruction = malloc(33);
 
     // initialize null terminator
     binaryInstruction[0] = '\0';
