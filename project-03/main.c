@@ -41,7 +41,7 @@ print result
 typedef struct instructionSet* link;
 
 struct instructionSet {
-  char machineCode[8];
+  char machineCode[32];
   int binary;
   //hex
   int opcode;
@@ -72,12 +72,10 @@ int main(int argc, char* argv[]){
     head = temp;
     node = temp;
 
-    //temporary values read from commandline
-    char *tempMachine;
-    //char *longitude;
-
     //commandline line
     char line[MAX_LENGTH];
+
+    char *tempHex;
 
     //open file from commandline
     FILE* input = fopen(argv[1],"r"); // "r" for read
@@ -90,18 +88,19 @@ int main(int argc, char* argv[]){
         // read args from file and build linked list
         while(fgets(line, 1000, input) != NULL){
             printf("%s \n", line);
-            tempMachine = strtok(line, "");
 
             node->next = malloc(sizeof(*node));
             node = node->next;
-            strcpy(node->machineCode, line);
+            tempHex = convertHexToBinary(line);
+            strcpy(node->machineCode, &tempHex);
+
         }
     }
 
     fclose(input);
     node->next = NULL;
 
-    printAll(head);
+    //printAll(head);
 
     return 0;
 }
@@ -126,11 +125,12 @@ void printAll( link x){
     return;
 }
 
-char* convertHexToBinary(char hex[]){
+char* convertHexToBinary(char* hex){
 
     int i =0;
     // create new char array with size for 4bit digits
-    char binaryInstruction[strlen(hex)*4];
+    char binaryInstruction[32];
+
     // initialize null terminator
     binaryInstruction[0] = '\0';
 
