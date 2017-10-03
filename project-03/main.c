@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <stdint.h>
 
 /*
 ############# PROJECT INFO #############
@@ -19,7 +20,7 @@ http://www.movable-type.co.uk/scripts/latlong.html
 
 Various links
 // https://swccd.instructure.com/courses/6682/assignments/31434
-// http://www.cplusplus.com/reference/cmath/cos/
+// http://www.kurtm.net/mipsasm/index.cgi
 */
 
 /*
@@ -57,8 +58,10 @@ struct instructionSet {
   link next;
 };
 // method declarations
-int convertHexAsciiValueToDecimal(char c);
+char* convertHexToBinary(char hex[]);
 void printIntArray(int array[], int arraySize);
+
+//typedef short int16_t
 
 #define MAX_LENGTH 1048576
 int main(int argc, char* argv[]){
@@ -116,71 +119,89 @@ void printAll( link x){
         printf("End\n");
     } else while(x!=NULL){
         printf("machineCode: %s \n", x->machineCode);
-        convertToBinary(x->machineCode);
+        convertHexToBinary(x->machineCode);
         printf("\n");
         x=x->next;
     }
     return;
 }
 
-void convertToBinary(char* machineCode){
+char* convertHexToBinary(char hex[]){
 
-    int i;
-    int digits[strlen(machineCode)];
-    for (i = 0; i < strlen(machineCode); i++){
-        int result = convertHexAsciiValueToDecimal(machineCode[i]);
-        printf("value: %d \n", result);
-        digits[i] = result;
-    }
+    int i =0;
+    // create new char array with size for 4bit digits
+    char binaryInstruction[strlen(hex)*4];
+    // initialize null terminator
+    binaryInstruction[0] = '\0';
 
-    for (i = 0; i < strlen(machineCode); i++){
-        int result = convertDecimalToBinary(digits[i]);
-        printf(" binary value: %d \n", result);
-        digits[i] = result;
-    }
-
-
-    printIntArray(digits,i-1);
-}
-
-int convertHexAsciiValueToDecimal(char c){
-    if(isalpha(c)){
-        char r = tolower(c);
-        if(r > 'f'){
-            // - Handle error here - character is not base 16
-            return 0;
+    // extract each hex digit and convert to 16bit binary
+    for(i=0; hex[i]!='\0'; i++)
+    {
+        switch(hex[i])
+        {
+            case '0':
+                strcat(binaryInstruction, "0000");
+                break;
+            case '1':
+                strcat(binaryInstruction, "0001");
+                break;
+            case '2':
+                strcat(binaryInstruction, "0010");
+                break;
+            case '3':
+                strcat(binaryInstruction, "0011");
+                break;
+            case '4':
+                strcat(binaryInstruction, "0100");
+                break;
+            case '5':
+                strcat(binaryInstruction, "0101");
+                break;
+            case '6':
+                strcat(binaryInstruction, "0110");
+                break;
+            case '7':
+                strcat(binaryInstruction, "0111");
+                break;
+            case '8':
+                strcat(binaryInstruction, "1000");
+                break;
+            case '9':
+                strcat(binaryInstruction, "1001");
+                break;
+            case 'a':
+            case 'A':
+                strcat(binaryInstruction, "1010");
+                break;
+            case 'b':
+            case 'B':
+                strcat(binaryInstruction, "1011");
+                break;
+            case 'c':
+            case 'C':
+                strcat(binaryInstruction, "1100");
+                break;
+            case 'd':
+            case 'D':
+                strcat(binaryInstruction, "1101");
+                break;
+            case 'e':
+            case 'E':
+                strcat(binaryInstruction, "1110");
+                break;
+            case 'f':
+            case 'F':
+                strcat(binaryInstruction, "1111");
+                break;
+            default:
+                // should be end of input
+                break;
         }
-
-        int nIndex = (int)('a' - r);
-        nIndex = -nIndex;
-        nIndex += 10;
-        return nIndex;
-    }
-    else if(isdigit(c)){
-        int nIndex = c - '0';
-        return nIndex;
     }
 
-    // Handle error here - character is not A-F or 0-9
-    return 0;
-}
+    printf("Binary number = %s \n", binaryInstruction);
+    return binaryInstruction;
 
-int convertDecimalToBinary(int decimal){
-
-    //need to check most significant bit if 1 or 0
-    // also check total num of digits
-    // if numDigits < 4 add digits according to sigBit
-
-        int remainder;
-        int binary = 0, i = 1;
-
-    while(decimal != 0) {
-        remainder = decimal%2;
-        decimal = decimal/2;
-        binary= binary + (remainder*i);
-        i = i*10;
-    }
-    return binary;
 }
 
 void printIntArray(int array[], int arraySize){
