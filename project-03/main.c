@@ -15,9 +15,6 @@ C library reference, has list of all includes
 Expected commandline input
 C:\programName instructions.txt
 
-Calculation checked against 'haversine' formula
-http://www.movable-type.co.uk/scripts/latlong.html
-
 Various links
 // https://swccd.instructure.com/courses/6682/assignments/31435
 // http://www.kurtm.net/mipsasm/index.cgi
@@ -108,6 +105,7 @@ int main(int argc, char* argv[]){
             // assign to current node
             strcpy(node->machineCode, line);
             strcpy(node->binary, convertHexToBinary(line));
+            node->opcode = getOpcode(node->binary);
         }
     }
 
@@ -129,11 +127,11 @@ void printAll( link x){
     } else if(x->next==NULL){
         printf("machineCode: %s \n", x->machineCode);
         printf("Binary number: %s \n", x->binary);
-
         printf("End\n");
     } else while(x!=NULL){
-        printf("machineCode: %s \n", x->machineCode);
+        printf("machineCode: %s", x->machineCode);
         printf("Binary number: %s \n", x->binary);
+        printf("Opcode: %d \n", x->opcode);
         printf("\n");
         x=x->next;
     }
@@ -226,8 +224,18 @@ void printIntArray(int array[], int arraySize){
     }
 }
 
-getOpcode(){
+getOpcode(char binary[32]){
     // return hex number
+    char opCode[6];
+    // analyse first 6 bits to determine opcode
+    for(int i = 0; i < 6; i++){
+        opCode[i] = binary[i];
+
+    }
+
+    //printf("opcode: %d", binaryToInteger(opCode));
+
+    return binaryToInteger(opCode);
 }
 
 getFunc(){
@@ -258,5 +266,9 @@ getImm(){
     // return Immediate value
     //which is last 4 digits of machineCode
     // IE: 24020004 = 0044
+}
+
+int binaryToInteger(const char *s){
+  return (int) strtol(s, NULL, 2);
 }
 
