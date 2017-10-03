@@ -26,13 +26,17 @@ Various links
 /*
 TODO:
 take input as string
-use ascii to integer
-integer to binary
 
-Have concatenated string(?) of binary instruction set
-figure out instruction format
-then get values based on that
-print result
+add to struct instructionSet
+
+add binary version of input aswell
+
+call individual functions to add rest of codes to struct
+
+Function to print a full instructionset
+
+Use printAll to display all instructionSets
+
 */
 
 
@@ -106,21 +110,16 @@ int main(int argc, char* argv[]){
             //tempHex = (char *) malloc(sizeof(char) * 32);
             tempHex = convertHexToBinary(line);
 
+            // assign to current node
             strcpy(node->machineCode, line);
             strcpy(node->binary, tempHex);
-
-            printf("temphex         : %s \n", tempHex);
-            printf("machineCode     : %s \n", node->machineCode);
-            printf("Binary Final    : %s \n", node->binary);
-            printf("\n");
-
         }
     }
 
     fclose(input);
     node->next = NULL;
 
-    //printAll(head);
+    printAll(head);
 
     return 0;
 }
@@ -133,13 +132,13 @@ void printAll( link x){
     if(x==NULL){
         return;
     } else if(x->next==NULL){
-        printf("machineCode2: %s \n", x->machineCode);
-        printf("Binary number2: %s \n", x->binary);
+        printf("machineCode: %s \n", x->machineCode);
+        printf("Binary number: %s \n", x->binary);
 
         printf("End\n");
     } else while(x!=NULL){
-        printf("machineCode2: %s \n", x->machineCode);
-        printf("Binary number2: %s \n", x->binary);
+        printf("machineCode: %s \n", x->machineCode);
+        printf("Binary number: %s \n", x->binary);
         printf("\n");
         x=x->next;
     }
@@ -220,7 +219,7 @@ char* convertHexToBinary(char* hex){
         }
     }
 
-    printf("Binary number   : %s \n", binaryInstruction);
+    //printf("Binary number   : %s \n", binaryInstruction);
     return binaryInstruction;
 
 }
@@ -232,7 +231,37 @@ void printIntArray(int array[], int arraySize){
     }
 }
 
+getOpcode(){
+    // return hex number
+}
 
+getFunc(){
+    // return func hex
+}
 
+getMIPS(){
+    // return operation (addiu, ori, lui, add etc)
+}
 
+getFormat(){
+    // return "I" or "R"
+}
+
+getRD(){
+    //return hex of RD
+}
+
+getRS(){
+    // return hex of RS
+}
+
+getRT(){
+    // return hex of RT
+}
+
+getImm(){
+    // return Immediate value
+    //which is last 4 digits of machineCode
+    // IE: 24020004 = 0044
+}
 
