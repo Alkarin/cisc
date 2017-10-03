@@ -19,7 +19,7 @@ Calculation checked against 'haversine' formula
 http://www.movable-type.co.uk/scripts/latlong.html
 
 Various links
-// https://swccd.instructure.com/courses/6682/assignments/31434
+// https://swccd.instructure.com/courses/6682/assignments/31435
 // http://www.kurtm.net/mipsasm/index.cgi
 */
 
