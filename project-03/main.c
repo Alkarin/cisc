@@ -105,14 +105,14 @@ int main(int argc, char* argv[]){
 
             //tempHex = (char *) malloc(sizeof(char) * 32);
             tempHex = convertHexToBinary(line);
-            printf("temphex: %s \n", tempHex);
-
 
             strcpy(node->machineCode, line);
-            strcpy(node->binary, &tempHex);
+            strcpy(node->binary, tempHex);
 
-            printf("machineCode: %s \n", node->machineCode);
-            printf("Binary number: %s \n", node->binary);
+            printf("temphex         : %s \n", tempHex);
+            printf("machineCode     : %s \n", node->machineCode);
+            printf("Binary Final    : %s \n", node->binary);
+            printf("\n");
 
         }
     }
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]){
     fclose(input);
     node->next = NULL;
 
-    printAll(head);
+    //printAll(head);
 
     return 0;
 }
@@ -220,7 +220,7 @@ char* convertHexToBinary(char* hex){
         }
     }
 
-    printf("Binary number = %s \n", binaryInstruction);
+    printf("Binary number   : %s \n", binaryInstruction);
     return binaryInstruction;
 
 }
