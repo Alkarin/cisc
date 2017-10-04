@@ -72,6 +72,7 @@ struct instructionSet {
 char* convertHexToBinary(char hex[]);
 char integerToHex(int integer);
 void printIntArray(int array[], int arraySize);
+char getFormat(int opcode);
 
 //typedef short int16_t
 
@@ -120,6 +121,7 @@ int main(int argc, char* argv[]){
             strcpy(node->machineCode, line);
             strcpy(node->binary, convertHexToBinary(line));
             node->opcode = getOpcode(node->binary);
+            node->Format = getFormat(node->opcode);
         }
     }
 
@@ -175,6 +177,7 @@ getOpcode(char binary[32]){
 }
 
 getFunc(){
+    // ONLY R instruction format will have func value
     // return func hex
 }
 
@@ -182,8 +185,21 @@ getMIPS(){
     // return operation (addiu, ori, lui, add etc)
 }
 
-getFormat(){
+char getFormat(int opcode){
+    char result;
     // return "I" or "R"
+    // read opcode values
+    //based off opcode, determine format
+    // maybe use switch statement to specifiy hex to format
+    // if opcode = 0, it is an R format instruction (and will then have a function)
+    if(opcode == 0){
+        //R format
+        result = 'R';
+        return result;
+    } else {
+        result = 'I';
+        return result;
+    }
 }
 
 getRD(){
@@ -229,7 +245,7 @@ void writeToFile(link x){
         fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
         fprintf(fp,"\n");
         */
-        fprintf(fp,"%s,%s,%c \n", x->machineCode,x->binary,integerToHex(x->opcode));
+        fprintf(fp,"%s,%s,%c,%c \n", x->machineCode,x->binary,integerToHex(x->opcode),x->Format);
         x=x->next;
     }
     return;
