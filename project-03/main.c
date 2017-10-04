@@ -97,7 +97,20 @@ int main(int argc, char* argv[]){
     } else {
         // read args from file and build linked list
         while(fgets(line, 1000, input) != NULL){
-            printf("%s \n", line);
+
+            // remove carriage return from string input
+            int i = 0;
+            while(i<10){
+                if(i == 8){
+                    // go to 8th index and push in terminating character
+                    line[i] = '\0';
+                }
+                printf("%d", line[i]);
+                i++;
+            }
+
+            printf("\n");
+            //printf("%s", line); //pull out last index of string array first?
 
             // allocate memory for next node
             node->next = malloc(sizeof(*node));
