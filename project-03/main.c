@@ -49,13 +49,13 @@ struct instructionSet {
 
   int binaryAsNum;
   //hex value
-  int opcode;
+  char opcode[2];
   //hex value
   char func[2];
 
-  int instruction;
+  char instruction[6];
 
-  char Format;
+  char format;
 
   int rd;
 
@@ -72,8 +72,10 @@ struct instructionSet {
 char* convertHexToBinary(char hex[]);
 char integerToHex(int integer);
 void printIntArray(int array[], int arraySize);
-char getFormat(int opcode);
+char getFormat(char opcode[2]);
 void getFunc(char format,char binary[32],char func[2]);
+void getOpcode(char opcode[2], char binary[32]);
+void getMIPS(char instruction[6],char opcode[2],char format,char func[2]);
 
 //typedef short int16_t
 
@@ -110,9 +112,6 @@ int main(int argc, char* argv[]){
                 i++;
             }
 
-            printf("\n");
-            //printf("%s", line); //pull out last index of string array first?
-
             // allocate memory for next node
             node->next = malloc(sizeof(*node));
             node = node->next;
@@ -121,11 +120,14 @@ int main(int argc, char* argv[]){
             // TODO change these from strcpy to function calls, similar to getFunc?
             strcpy(node->machineCode, line);
             strcpy(node->binary, convertHexToBinary(line));
-            node->opcode = getOpcode(node->binary);
-            node->Format = getFormat(node->opcode);
 
-            getFunc(node->Format,node->binary,node->func);
-            printf("node->func: %s", node->func);
+            getOpcode(node->opcode, node->binary);
+
+            node->format = getFormat(node->opcode);
+
+            getFunc(node->format,node->binary,node->func);
+            getMIPS(node->instruction,node->opcode,node->format,node->func);
+
             printf("\n");
         }
     }
@@ -153,32 +155,24 @@ void printAll( link x){
     } else while(x!=NULL){
         printf("machineCode: %s", x->machineCode);
         printf("Binary number: %s \n", x->binary);
-        printf("Opcode: %c \n", integerToHex(x->opcode));
+        //printf("Opcode: %c \n", integerToHex(x->opcode));
         printf("\n");
         x=x->next;
     }
     return;
 }
 
-void printIntArray(int array[], int arraySize){
-    int i;
-    for (i=0; i < arraySize; i++) {
-        printf("%d",array[i]);
-    }
-}
-
-getOpcode(char binary[32]){
+void getOpcode(char opcode[2], char binary[32]){
     // return hex number
-    char opCode[6];
+    char opCodeTemp[6];
+    char result[2];
     // analyse first 6 bits to determine opcode
     for(int i = 0; i < 6; i++){
-        opCode[i] = binary[i];
+        opCodeTemp[i] = binary[i];
 
     }
-
-    //printf("opcode: %d", binaryToInteger(opCode));
-
-    return binaryToInteger(opCode);
+    sprintf(result, "%x", binaryToInteger(opCodeTemp));
+    strcpy(opcode,result);
 }
 
 void getFunc(char format,char binary[32],char func[2]){
@@ -219,16 +213,33 @@ void getFunc(char format,char binary[32],char func[2]){
     }
 }
 
-getMIPS(){
+void getMIPS(char instruction[6],char opcode[2],char format,char func[2]){
     // return operation (addiu, ori, lui, add etc)
+    char result[6];
+    if(format == 'R'){
+        // R format
+        // use func
+
+    } else {
+        // I format
+        // use opcode
+        //opcode is
+        while (strcmp("9",opcode) == 0){
+            printf("opcode: %s is instruction addiu \n",opcode);
+            sprintf(result, "%s", "addiu");
+            strcpy(instruction,result);
+            break;
+        }
+    }
 }
 
-char getFormat(int opcode){
+char getFormat(char opcode[2]){
     char result;
+    int hexToInt = (int)strtol(opcode, NULL, 16);
     // return "I" or "R"
     // read opcode values
     // if opcode = 0, it is an R format instruction (and will then have a function)
-    if(opcode == 0){
+    if(hexToInt == 0){
         //R format
         result = 'R';
         return result;
@@ -255,6 +266,11 @@ getImm(){
     //which is last 4 digits of machineCode
     // IE: 24020004 = 0044
 }
+/*
+char integerToHex(const char *s){
+  return (int) strtol(s, NULL, 2);
+}
+*/
 
 int binaryToInteger(const char *s){
   return (int) strtol(s, NULL, 2);
@@ -272,7 +288,7 @@ void writeToFile(link x){
     } else if(x->next==NULL){
         fprintf(fp,"machineCode: %s \n", x->machineCode);
         fprintf(fp,"Binary number: %s \n", x->binary);
-        fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
+        //fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
         fprintf(fp,"End\n");
     } else while(x!=NULL){
         /*
@@ -281,71 +297,10 @@ void writeToFile(link x){
         fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
         fprintf(fp,"\n");
         */
-        fprintf(fp,"%s,%s,%c,%s,%c \n", x->machineCode,x->binary,integerToHex(x->opcode),x->func,x->Format);
+        fprintf(fp,"%s,%s,%s,%s,%s,%c \n", x->machineCode,x->binary,x->opcode,x->func,x->instruction,x->format);
         x=x->next;
     }
     return;
-}
-
-char integerToHex(int integer){
-    //only converts to single digit hex (0-15)
-    char result;
-    //printf("integer: %d \n", integer);
-    switch(integer){
-        case 0:
-            result = '0';
-            return result;
-        case 1:
-            result = '1';
-            return result;
-        case 2:
-            result = '2';
-            return result;
-        case 3:
-            result = '3';
-            return result;
-        case 4:
-            result = '4';
-            return result;
-        case 5:
-            result = '5';
-            return result;
-        case 6:
-            result = '6';
-            return result;
-        case 7:
-            result = '7';
-            return result;
-        case 8:
-            result = '8';
-            return result;
-        case 9:
-            result = '9';
-            return result;
-        case 10:
-            result = 'a';
-            return result;
-        case 11:
-            result = 'b';
-            return result;
-        case 12:
-            result = 'c';
-            return result;
-        case 13:
-            result = 'd';
-            return result;
-        case 14:
-            result = 'e';
-            return result;
-        case 15:
-            result = 'f';
-            return result;
-        default:
-            // NOT A HEX VALUE
-            result = 'x';
-            return result;
-            break;
-    }
 }
 
 char* convertHexToBinary(char* hex){
