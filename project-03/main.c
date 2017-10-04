@@ -48,10 +48,10 @@ struct instructionSet {
   char binary[32];
 
   int binaryAsNum;
-  //hex
+  //hex value
   int opcode;
-  //hex
-  int func;
+  //hex value
+  char func[2];
 
   int instruction;
 
@@ -176,9 +176,22 @@ getOpcode(char binary[32]){
     return binaryToInteger(opCode);
 }
 
-getFunc(){
+char* getFunc(char format,char binary[32]){
+    char result[2];
     // ONLY R instruction format will have func value
     // return func hex
+    if(format == 'R'){
+        // read last 6 digits of binary
+        // get them as a int value
+        // convert int value to 2 digit hex string
+        // return that 2digit hex string (char *)
+
+    } else {
+        // Format is I instruction, which has no function code
+        result[0] = '-';
+        result[1] = '\0'
+        return result;
+    }
 }
 
 getMIPS(){
