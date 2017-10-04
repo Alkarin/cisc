@@ -73,6 +73,7 @@ char* convertHexToBinary(char hex[]);
 char integerToHex(int integer);
 void printIntArray(int array[], int arraySize);
 char getFormat(int opcode);
+void getFunc(char format,char binary[32],char func[2]);
 
 //typedef short int16_t
 
@@ -106,7 +107,6 @@ int main(int argc, char* argv[]){
                     // go to 8th index and push in terminating character
                     line[i] = '\0';
                 }
-                printf("%d", line[i]);
                 i++;
             }
 
@@ -118,10 +118,15 @@ int main(int argc, char* argv[]){
             node = node->next;
 
             // assign to current node
+            // TODO change these from strcpy to function calls, similar to getFunc?
             strcpy(node->machineCode, line);
             strcpy(node->binary, convertHexToBinary(line));
             node->opcode = getOpcode(node->binary);
             node->Format = getFormat(node->opcode);
+
+            getFunc(node->Format,node->binary,node->func);
+            printf("node->func: %s", node->func);
+            printf("\n");
         }
     }
 
@@ -176,21 +181,41 @@ getOpcode(char binary[32]){
     return binaryToInteger(opCode);
 }
 
-char* getFunc(char format,char binary[32]){
+void getFunc(char format,char binary[32],char func[2]){
     char result[2];
+    char binarySet[6];
+    int hexAsInt = 0;
+    //printf("binary: %s \n", binary);
     // ONLY R instruction format will have func value
     // return func hex
     if(format == 'R'){
         // read last 6 digits of binary
-        // get them as a int value
         // convert int value to 2 digit hex string
-        // return that 2digit hex string (char *)
+        for(int i = 0; i < 34; i++){
+            //printf("int i: %d \n", i);
+            if( i >= 26){
+                //printf("setting binarySet[%c] with binary[%c] \n",binarySet[i], binary[i]);
+                binarySet[i-26] = binary[i];
+            }
+        }
+
+        //printf("binarySet %s \n", binarySet);
+        hexAsInt = binaryToInteger(binarySet);
+
+        // places HexAsInt as a hex value into result
+        sprintf(result, "%x", hexAsInt);
+        printf("result: %s \n", result);
+        //return result;
+        strcpy(func,result);
+
+
 
     } else {
         // Format is I instruction, which has no function code
         result[0] = '-';
-        result[1] = '\0'
-        return result;
+        result[1] = '\0';
+        strcpy(func,result);
+        //return result;
     }
 }
 
@@ -202,8 +227,6 @@ char getFormat(int opcode){
     char result;
     // return "I" or "R"
     // read opcode values
-    //based off opcode, determine format
-    // maybe use switch statement to specifiy hex to format
     // if opcode = 0, it is an R format instruction (and will then have a function)
     if(opcode == 0){
         //R format
@@ -258,15 +281,16 @@ void writeToFile(link x){
         fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
         fprintf(fp,"\n");
         */
-        fprintf(fp,"%s,%s,%c,%c \n", x->machineCode,x->binary,integerToHex(x->opcode),x->Format);
+        fprintf(fp,"%s,%s,%c,%s,%c \n", x->machineCode,x->binary,integerToHex(x->opcode),x->func,x->Format);
         x=x->next;
     }
     return;
 }
 
 char integerToHex(int integer){
+    //only converts to single digit hex (0-15)
     char result;
-    printf("integer: %d \n", integer);
+    //printf("integer: %d \n", integer);
     switch(integer){
         case 0:
             result = '0';
