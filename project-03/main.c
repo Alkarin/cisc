@@ -113,7 +113,8 @@ int main(int argc, char* argv[]){
     fclose(input);
     node->next = NULL;
 
-    printAll(head);
+    //printAll(head);
+    writeToFile(head);
 
     return 0;
 }
@@ -192,6 +193,33 @@ getImm(){
 
 int binaryToInteger(const char *s){
   return (int) strtol(s, NULL, 2);
+}
+
+void writeToFile(link x){
+    FILE* fp = fopen("out.csv", "w"); //to write
+
+    //skips uninitialized node
+    x=x->next;
+
+    printf("\n");
+    if(x==NULL){
+        return;
+    } else if(x->next==NULL){
+        fprintf(fp,"machineCode: %s \n", x->machineCode);
+        fprintf(fp,"Binary number: %s \n", x->binary);
+        fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
+        fprintf(fp,"End\n");
+    } else while(x!=NULL){
+        /*
+        fprintf(fp,"machineCode: %s \n", x->machineCode);
+        fprintf(fp,"Binary number: %s \n", x->binary);
+        fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
+        fprintf(fp,"\n");
+        */
+        fprintf(fp,"%s,%s,%c \n", x->machineCode,x->binary,integerToHex(x->opcode));
+        x=x->next;
+    }
+    return;
 }
 
 char integerToHex(int integer){
