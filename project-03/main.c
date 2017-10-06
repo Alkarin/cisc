@@ -48,10 +48,13 @@ struct instructionSet {
   char binary[32];
 
   int binaryAsNum;
+
+
+  //declare as size 3, 2 for digits +1 null terminator
   //hex value
-  char opcode[2];
+  char opcode[3];
   //hex value
-  char func[2];
+  char func[3];
 
   char instruction[6];
 
@@ -72,10 +75,10 @@ struct instructionSet {
 char* convertHexToBinary(char hex[]);
 char integerToHex(int integer);
 void printIntArray(int array[], int arraySize);
-char getFormat(char opcode[2]);
-void getFunc(char format,char binary[32],char func[2]);
-void getOpcode(char opcode[2], char binary[32]);
-void getMIPS(char instruction[6],char opcode[2],char format,char func[2]);
+char getFormat(char opcode[3]);
+void getFunc(char format,char binary[32],char func[3]);
+void getOpcode(char opcode[3], char binary[32]);
+void getMIPS(char instruction[6],char opcode[3],char format,char func[3]);
 
 //typedef short int16_t
 
@@ -162,7 +165,7 @@ void printAll( link x){
     return;
 }
 
-void getOpcode(char opcode[2], char binary[32]){
+void getOpcode(char opcode[3], char binary[32]){
     // return hex number
     char opCodeTemp[6];
     char result[2];
@@ -175,8 +178,8 @@ void getOpcode(char opcode[2], char binary[32]){
     strcpy(opcode,result);
 }
 
-void getFunc(char format,char binary[32],char func[2]){
-    char result[2];
+void getFunc(char format,char binary[32],char func[3]){
+    char result[3];
     char binarySet[6];
     int hexAsInt = 0;
     //printf("binary: %s \n", binary);
@@ -198,11 +201,9 @@ void getFunc(char format,char binary[32],char func[2]){
 
         // places HexAsInt as a hex value into result
         sprintf(result, "%x", hexAsInt);
-        printf("result: %s \n", result);
+        //printf("result: %s \n", result);
         //return result;
         strcpy(func,result);
-
-
 
     } else {
         // Format is I instruction, which has no function code
@@ -213,27 +214,208 @@ void getFunc(char format,char binary[32],char func[2]){
     }
 }
 
-void getMIPS(char instruction[6],char opcode[2],char format,char func[2]){
+void getMIPS(char instruction[6],char opcode[3],char format,char func[3]){
     // return operation (addiu, ori, lui, add etc)
     char result[6];
     if(format == 'R'){
         // R format
         // use func
+        if (strcmp("20",func) == 0){
+            //printf("funcBefore: %s \n", func);
+            printf("opcode: %s is instruction add \n",func);
+            sprintf(result, "%s", "add");
+            strcpy(instruction,result);
+            //printf("funcAfter: %s \n", func);
+            return;
+        } else if(strcmp("21",func) == 0){
+                printf("opcode: %s is instruction addu \n",func);
+            sprintf(result, "%s", "addu");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("24",func) == 0){
+                printf("opcode: %s is instruction and \n",func);
+            sprintf(result, "%s", "and");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("08",func) == 0){
+                printf("opcode: %s is instruction jr \n",func);
+            sprintf(result, "%s", "jr");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("27",func) == 0){
+                printf("opcode: %s is instruction nor \n",func);
+            sprintf(result, "%s", "nor");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("25",func) == 0){
+                printf("opcode: %s is instruction or \n",func);
+            sprintf(result, "%s", "or");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("2a",func) == 0){
+                printf("opcode: %s is instruction slt \n",func);
+            sprintf(result, "%s", "slt");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("2b",func) == 0){
+                printf("opcode: %s is instruction sltu \n",func);
+            sprintf(result, "%s", "sltu");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("00",func) == 0){
+                printf("opcode: %s is instruction sll \n",func);
+            sprintf(result, "%s", "sll");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("02",func) == 0){
+                printf("opcode: %s is instruction srl \n",func);
+            sprintf(result, "%s", "srl");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("22",func) == 0){
+                printf("opcode: %s is instruction sub \n",func);
+            sprintf(result, "%s", "sub");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("23",func) == 0){
+                printf("opcode: %s is instruction subu \n",func);
+            sprintf(result, "%s", "subu");
+            strcpy(instruction,result);
+            return;
+
+        }
+
 
     } else {
         // I format
         // use opcode
         //opcode is
+        if (strcmp("9",opcode) == 0){
+            printf("opcode: %s is instruction addiu \n",opcode);
+            sprintf(result, "%s", "addiu");
+            strcpy(instruction,result);
+            return;
+        } else if(strcmp("8",opcode) == 0){
+                printf("opcode: %s is instruction addi \n",opcode);
+            sprintf(result, "%s", "addi");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("c",opcode) == 0){
+                printf("opcode: %s is instruction andi \n",opcode);
+            sprintf(result, "%s", "andi");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("4",opcode) == 0){
+                printf("opcode: %s is instruction beq \n",opcode);
+            sprintf(result, "%s", "beq");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("5",opcode) == 0){
+                printf("opcode: %s is instruction bne \n",opcode);
+            sprintf(result, "%s", "bne");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("24",opcode) == 0){
+                printf("opcode: %s is instruction lbu \n",opcode);
+            sprintf(result, "%s", "lbu");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("25",opcode) == 0){
+                printf("opcode: %s is instruction lhu \n",opcode);
+            sprintf(result, "%s", "lhu");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("30",opcode) == 0){
+                printf("opcode: %s is instruction ll \n",opcode);
+            sprintf(result, "%s", "ll");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("f",opcode) == 0){
+                printf("opcode: %s is instruction lui \n",opcode);
+            sprintf(result, "%s", "lui");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("23",opcode) == 0){
+                printf("opcode: %s is instruction lw \n",opcode);
+            sprintf(result, "%s", "lw");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("d",opcode) == 0){
+                printf("opcode: %s is instruction ori \n",opcode);
+            sprintf(result, "%s", "ori");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("a",opcode) == 0){
+                printf("opcode: %s is instruction slti \n",opcode);
+            sprintf(result, "%s", "slti");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("b",opcode) == 0){
+                printf("opcode: %s is instruction sltiu \n",opcode);
+            sprintf(result, "%s", "sltiu");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("28",opcode) == 0){
+                printf("opcode: %s is instruction sb \n",opcode);
+            sprintf(result, "%s", "sb");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("38",opcode) == 0){
+                printf("opcode: %s is instruction sc \n",opcode);
+            sprintf(result, "%s", "sc");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("29",opcode) == 0){
+                printf("opcode: %s is instruction sh \n",opcode);
+            sprintf(result, "%s", "sh");
+            strcpy(instruction,result);
+            return;
+
+        } else if(strcmp("2b",opcode) == 0){
+                printf("opcode: %s is instruction sw \n",opcode);
+            sprintf(result, "%s", "sw");
+            strcpy(instruction,result);
+            return;
+
+        }
+
+
+        /*
         while (strcmp("9",opcode) == 0){
             printf("opcode: %s is instruction addiu \n",opcode);
             sprintf(result, "%s", "addiu");
             strcpy(instruction,result);
             break;
         }
+        */
     }
 }
 
-char getFormat(char opcode[2]){
+char getFormat(char opcode[3]){
     char result;
     int hexToInt = (int)strtol(opcode, NULL, 16);
     // return "I" or "R"
