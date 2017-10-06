@@ -60,7 +60,7 @@ struct instructionSet {
 
   char format;
 
-  int rd;
+  char rd[3];
 
   int rs;
 
@@ -79,6 +79,7 @@ char getFormat(char opcode[3]);
 void getFunc(char format,char binary[32],char func[3]);
 void getOpcode(char opcode[3], char binary[32]);
 void getMIPS(char instruction[6],char opcode[3],char format,char func[3]);
+void getRD(char rd[3],char binary[32],char format);
 
 //typedef short int16_t
 
@@ -130,6 +131,7 @@ int main(int argc, char* argv[]){
 
             getFunc(node->format,node->binary,node->func);
             getMIPS(node->instruction,node->opcode,node->format,node->func);
+            getRD(node->rd,node->binary,node->format);
 
             printf("\n");
         }
@@ -215,7 +217,7 @@ void getFunc(char format,char binary[32],char func[3]){
 }
 
 void getMIPS(char instruction[6],char opcode[3],char format,char func[3]){
-    // return operation (addiu, ori, lui, add etc)
+    // set instruction to operation (addiu, ori, lui, add etc)
     char result[6];
     if(format == 'R'){
         // R format
@@ -292,14 +294,11 @@ void getMIPS(char instruction[6],char opcode[3],char format,char func[3]){
             sprintf(result, "%s", "subu");
             strcpy(instruction,result);
             return;
-
         }
-
 
     } else {
         // I format
         // use opcode
-        //opcode is
         if (strcmp("9",opcode) == 0){
             printf("opcode: %s is instruction addiu \n",opcode);
             sprintf(result, "%s", "addiu");
@@ -400,18 +399,7 @@ void getMIPS(char instruction[6],char opcode[3],char format,char func[3]){
             sprintf(result, "%s", "sw");
             strcpy(instruction,result);
             return;
-
         }
-
-
-        /*
-        while (strcmp("9",opcode) == 0){
-            printf("opcode: %s is instruction addiu \n",opcode);
-            sprintf(result, "%s", "addiu");
-            strcpy(instruction,result);
-            break;
-        }
-        */
     }
 }
 
@@ -431,8 +419,49 @@ char getFormat(char opcode[3]){
     }
 }
 
-getRD(){
+void getRD(char rd[3],char binary[32],char format){
+
     //return hex of RD
+
+    char result[3];
+    char binarySet[6];
+    int binaryAsInt = 0;
+    printf("binary: %s \n", binary);
+    // ONLY R instruction format will have RD value
+    // return RD hex
+    if(format == 'R'){
+        // read digits 16-20 of binary
+        // convert int value to 2 digit hex string
+        int j = 0;
+        for(int i = 0; i < 34; i++){
+            //printf("int i: %d \n", i);
+            if( i >= 16 && i <=20){
+                //printf("int i: %d \n", i);
+                //printf("int j: %d \n", j);
+                //printf("setting binarySet[%d] with binary[%c] \n",binarySet[j], binary[i]);
+                binarySet[j] = binary[i];
+                //printf("binaryset[%d]: %c\n",binarySet[j],binarySet[i]);
+                j++;
+            }
+        }
+        // set last value as null terminator
+        binarySet[5] = '\0';
+
+        binaryAsInt = binaryToInteger(binarySet);
+
+        // places binary as integer into rd
+        sprintf(result, "%d", binaryAsInt);
+        printf("result: %s \n", result);
+        //return result;
+        strcpy(rd,result);
+
+    } else {
+        // Format is I instruction, which has no rd value
+        result[0] = '-';
+        result[1] = '\0';
+        strcpy(rd,result);
+        //return result;
+    }
 }
 
 getRS(){
@@ -479,7 +508,7 @@ void writeToFile(link x){
         fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
         fprintf(fp,"\n");
         */
-        fprintf(fp,"%s,%s,%s,%s,%s,%c \n", x->machineCode,x->binary,x->opcode,x->func,x->instruction,x->format);
+        fprintf(fp,"%s,%s,%s,%s,%s,%c,%s \n", x->machineCode,x->binary,x->opcode,x->func,x->instruction,x->format,x->rd);
         x=x->next;
     }
     return;
