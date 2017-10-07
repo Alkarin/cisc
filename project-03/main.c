@@ -64,7 +64,7 @@ struct instructionSet {
 
   char rs[3];
 
-  int rt;
+  char rt[3];
 
   //hex
   int Imm;
@@ -81,6 +81,7 @@ void getOpcode(char opcode[3], char binary[32]);
 void getMIPS(char instruction[6],char opcode[3],char format,char func[3]);
 void getRD(char rd[3],char binary[32],char format);
 void getRS(char rs[3],char binary[32]);
+void getRT(char rt[3],char binary[32]);
 
 //typedef short int16_t
 
@@ -134,6 +135,7 @@ int main(int argc, char* argv[]){
             getMIPS(node->instruction,node->opcode,node->format,node->func);
             getRD(node->rd,node->binary,node->format);
             getRS(node->rs,node->binary);
+            getRT(node->rt,node->binary);
 
             printf("\n");
         }
@@ -480,6 +482,41 @@ void getRS(char rs[3],char binary[32]){
     for(int i = 0; i < 34; i++){
         //printf("int i: %d \n", i);
         if( i >=6  && i <=10){
+            //printf("int i: %d \n", i);
+            //printf("int j: %d \n", j);
+            //printf("setting binarySet[%d] with binary[%c] \n",binarySet[j], binary[i]);
+            binarySet[j] = binary[i];
+            //printf("binaryset[%d]: %c\n",binarySet[j],binarySet[i]);
+            j++;
+        }
+    }
+    // set last value as null terminator
+    binarySet[5] = '\0';
+
+    binaryAsInt = binaryToInteger(binarySet);
+
+    // places binary as integer into rd
+    sprintf(result, "%d", binaryAsInt);
+    //printf("result: %s \n", result);
+    //return result;
+    strcpy(rs,result);
+
+}
+
+void getRT(char rt[3],char binary[32]){
+    // will have RT for R and I formats
+    // set RT as int value
+    char result[3];
+    char binarySet[6];
+    int binaryAsInt = 0;
+    printf("binary: %s \n", binary);
+
+    // read digits 6-10 of binary
+    // convert int value to 2 digit int string
+    int j = 0;
+    for(int i = 0; i < 34; i++){
+        //printf("int i: %d \n", i);
+        if( i >=11  && i <=15){
             printf("int i: %d \n", i);
             printf("int j: %d \n", j);
             printf("setting binarySet[%d] with binary[%c] \n",binarySet[j], binary[i]);
@@ -497,12 +534,7 @@ void getRS(char rs[3],char binary[32]){
     sprintf(result, "%d", binaryAsInt);
     printf("result: %s \n", result);
     //return result;
-    strcpy(rs,result);
-
-}
-
-getRT(){
-    // return int of RT
+    strcpy(rt,result);
 }
 
 getImm(){
@@ -541,7 +573,7 @@ void writeToFile(link x){
         fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
         fprintf(fp,"\n");
         */
-        fprintf(fp,"%s,%s,%s,%s,%s,%c,%s,%s \n", x->machineCode,x->binary,x->opcode,x->func,x->instruction,x->format,x->rd,x->rs);
+        fprintf(fp,"%s,%s,%s,%s,%s,%c,%s,%s,%s \n", x->machineCode,x->binary,x->opcode,x->func,x->instruction,x->format,x->rd,x->rs,x->rt);
         x=x->next;
     }
     return;
