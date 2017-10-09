@@ -13,13 +13,29 @@ cplusplus.com
 C library reference, has list of all includes
 
 Expected commandline input
-C:\programName hexInstructions.txt
+C:\programName instructions.txt
 
 Various links
 // https://swccd.instructure.com/courses/6682/assignments/31435
 // http://www.kurtm.net/mipsasm/index.cgi
-// https://www.eg.bucknell.edu/~csci320/mips_web/
 */
+
+/*
+TODO:
+take input as string
+
+add to struct instructionSet
+
+add binary version of input aswell
+
+call individual functions to add rest of codes to struct
+
+Function to print a full instructionset
+
+Use printAll to display all instructionSets
+
+*/
+
 
 // struct declarations
 // alias for struct instructionSet* with name "link"
@@ -32,6 +48,10 @@ struct instructionSet {
   // instruction converted to 32bit binary
   char binary[32];
 
+  int binaryAsNum;
+
+
+  //declare as size 3, 2 for digits +1 null terminator
   //hex value
   char opcode[3];
   //hex value
@@ -99,13 +119,15 @@ int main(int argc, char* argv[]){
                 }
                 i++;
             }
-            // NOTE: since we are automatically going to next node, head node is never initialized
+            // NOTE:
+            //since we are automatically going to next node, head node is never initialized
 
             // allocate memory for next node
             node->next = malloc(sizeof(*node));
             node = node->next;
 
-            // assign values for current node
+            // assign to current node
+            // TODO change these from strcpy to function calls, similar to getFunc?
             strcpy(node->machineCode, line);
             strcpy(node->binary, convertHexToBinary(line));
 
@@ -119,15 +141,39 @@ int main(int argc, char* argv[]){
             getRS(node->rs,node->binary);
             getRT(node->rt,node->binary);
             getImm(node->format,node->binary,node->Imm);
+
+            printf("\n");
         }
     }
 
     fclose(input);
     node->next = NULL;
 
+    //printAll(head);
     writeToFile(head);
 
     return 0;
+}
+
+void printAll( link x){
+    //skips uninitialized node
+    x=x->next;
+
+    printf("\n");
+    if(x==NULL){
+        return;
+    } else if(x->next==NULL){
+        printf("machineCode: %s \n", x->machineCode);
+        printf("Binary number: %s \n", x->binary);
+        printf("End\n");
+    } else while(x!=NULL){
+        printf("machineCode: %s", x->machineCode);
+        printf("Binary number: %s \n", x->binary);
+        //printf("Opcode: %c \n", integerToHex(x->opcode));
+        printf("\n");
+        x=x->next;
+    }
+    return;
 }
 
 void getOpcode(char opcode[3], char binary[32]){
@@ -147,20 +193,27 @@ void getFunc(char format,char binary[32],char func[3]){
     char result[3];
     char binarySet[6];
     int hexAsInt = 0;
+    //printf("binary: %s \n", binary);
     // ONLY R instruction format will have func value
+    // return func hex
     if(format == 'R'){
         // read last 6 digits of binary
         // convert int value to 2 digit hex string
         for(int i = 0; i < 34; i++){
+            //printf("int i: %d \n", i);
             if( i >= 26){
+                //printf("setting binarySet[%c] with binary[%c] \n",binarySet[i], binary[i]);
                 binarySet[i-26] = binary[i];
             }
         }
 
+        //printf("binarySet %s \n", binarySet);
         hexAsInt = binaryToInteger(binarySet);
 
         // places HexAsInt as a hex value into result
         sprintf(result, "%x", hexAsInt);
+        //printf("result: %s \n", result);
+        //return result;
         strcpy(func,result);
 
     } else {
@@ -168,6 +221,7 @@ void getFunc(char format,char binary[32],char func[3]){
         result[0] = '-';
         result[1] = '\0';
         strcpy(func,result);
+        //return result;
     }
 }
 
@@ -178,72 +232,74 @@ void getMIPS(char instruction[6],char opcode[3],char format,char func[3]){
         // R format
         // use func
         if (strcmp("20",func) == 0){
-            //printf("opcode: %s is instruction add \n",func);
+            //printf("funcBefore: %s \n", func);
+            printf("opcode: %s is instruction add \n",func);
             sprintf(result, "%s", "add");
             strcpy(instruction,result);
+            //printf("funcAfter: %s \n", func);
             return;
         } else if(strcmp("21",func) == 0){
-            //printf("opcode: %s is instruction addu \n",func);
+                printf("opcode: %s is instruction addu \n",func);
             sprintf(result, "%s", "addu");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("24",func) == 0){
-            //printf("opcode: %s is instruction and \n",func);
+                printf("opcode: %s is instruction and \n",func);
             sprintf(result, "%s", "and");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("08",func) == 0){
-            //printf("opcode: %s is instruction jr \n",func);
+                printf("opcode: %s is instruction jr \n",func);
             sprintf(result, "%s", "jr");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("27",func) == 0){
-            //printf("opcode: %s is instruction nor \n",func);
+                printf("opcode: %s is instruction nor \n",func);
             sprintf(result, "%s", "nor");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("25",func) == 0){
-            //printf("opcode: %s is instruction or \n",func);
+                printf("opcode: %s is instruction or \n",func);
             sprintf(result, "%s", "or");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("2a",func) == 0){
-            //printf("opcode: %s is instruction slt \n",func);
+                printf("opcode: %s is instruction slt \n",func);
             sprintf(result, "%s", "slt");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("2b",func) == 0){
-            //printf("opcode: %s is instruction sltu \n",func);
+                printf("opcode: %s is instruction sltu \n",func);
             sprintf(result, "%s", "sltu");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("00",func) == 0){
-            //printf("opcode: %s is instruction sll \n",func);
+                printf("opcode: %s is instruction sll \n",func);
             sprintf(result, "%s", "sll");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("02",func) == 0){
-            //printf("opcode: %s is instruction srl \n",func);
+                printf("opcode: %s is instruction srl \n",func);
             sprintf(result, "%s", "srl");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("22",func) == 0){
-            //printf("opcode: %s is instruction sub \n",func);
+                printf("opcode: %s is instruction sub \n",func);
             sprintf(result, "%s", "sub");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("23",func) == 0){
-            //printf("opcode: %s is instruction subu \n",func);
+                printf("opcode: %s is instruction subu \n",func);
             sprintf(result, "%s", "subu");
             strcpy(instruction,result);
             return;
@@ -253,102 +309,102 @@ void getMIPS(char instruction[6],char opcode[3],char format,char func[3]){
         // I format
         // use opcode
         if (strcmp("9",opcode) == 0){
-            //printf("opcode: %s is instruction addiu \n",opcode);
+            printf("opcode: %s is instruction addiu \n",opcode);
             sprintf(result, "%s", "addiu");
             strcpy(instruction,result);
             return;
         } else if(strcmp("8",opcode) == 0){
-            //printf("opcode: %s is instruction addi \n",opcode);
+                printf("opcode: %s is instruction addi \n",opcode);
             sprintf(result, "%s", "addi");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("c",opcode) == 0){
-            //printf("opcode: %s is instruction andi \n",opcode);
+                printf("opcode: %s is instruction andi \n",opcode);
             sprintf(result, "%s", "andi");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("4",opcode) == 0){
-            //printf("opcode: %s is instruction beq \n",opcode);
+                printf("opcode: %s is instruction beq \n",opcode);
             sprintf(result, "%s", "beq");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("5",opcode) == 0){
-            //printf("opcode: %s is instruction bne \n",opcode);
+                printf("opcode: %s is instruction bne \n",opcode);
             sprintf(result, "%s", "bne");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("24",opcode) == 0){
-            //printf("opcode: %s is instruction lbu \n",opcode);
+                printf("opcode: %s is instruction lbu \n",opcode);
             sprintf(result, "%s", "lbu");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("25",opcode) == 0){
-            //printf("opcode: %s is instruction lhu \n",opcode);
+                printf("opcode: %s is instruction lhu \n",opcode);
             sprintf(result, "%s", "lhu");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("30",opcode) == 0){
-            //printf("opcode: %s is instruction ll \n",opcode);
+                printf("opcode: %s is instruction ll \n",opcode);
             sprintf(result, "%s", "ll");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("f",opcode) == 0){
-            //printf("opcode: %s is instruction lui \n",opcode);
+                printf("opcode: %s is instruction lui \n",opcode);
             sprintf(result, "%s", "lui");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("23",opcode) == 0){
-            //printf("opcode: %s is instruction lw \n",opcode);
+                printf("opcode: %s is instruction lw \n",opcode);
             sprintf(result, "%s", "lw");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("d",opcode) == 0){
-            //printf("opcode: %s is instruction ori \n",opcode);
+                printf("opcode: %s is instruction ori \n",opcode);
             sprintf(result, "%s", "ori");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("a",opcode) == 0){
-            //printf("opcode: %s is instruction slti \n",opcode);
+                printf("opcode: %s is instruction slti \n",opcode);
             sprintf(result, "%s", "slti");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("b",opcode) == 0){
-            //printf("opcode: %s is instruction sltiu \n",opcode);
+                printf("opcode: %s is instruction sltiu \n",opcode);
             sprintf(result, "%s", "sltiu");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("28",opcode) == 0){
-            //printf("opcode: %s is instruction sb \n",opcode);
+                printf("opcode: %s is instruction sb \n",opcode);
             sprintf(result, "%s", "sb");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("38",opcode) == 0){
-            //printf("opcode: %s is instruction sc \n",opcode);
+                printf("opcode: %s is instruction sc \n",opcode);
             sprintf(result, "%s", "sc");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("29",opcode) == 0){
-            //printf("opcode: %s is instruction sh \n",opcode);
+                printf("opcode: %s is instruction sh \n",opcode);
             sprintf(result, "%s", "sh");
             strcpy(instruction,result);
             return;
 
         } else if(strcmp("2b",opcode) == 0){
-            //printf("opcode: %s is instruction sw \n",opcode);
+                printf("opcode: %s is instruction sw \n",opcode);
             sprintf(result, "%s", "sw");
             strcpy(instruction,result);
             return;
@@ -377,14 +433,20 @@ void getRD(char rd[3],char binary[32],char format){
     char result[3];
     char binarySet[6];
     int binaryAsInt = 0;
+    //printf("binary: %s \n", binary);
     // ONLY R instruction format will have RD value
     if(format == 'R'){
         // read digits 16-20 of binary
         // convert int value to 2 digit int string
         int j = 0;
         for(int i = 0; i < 34; i++){
+            //printf("int i: %d \n", i);
             if( i >= 16 && i <=20){
+                //printf("int i: %d \n", i);
+                //printf("int j: %d \n", j);
+                //printf("setting binarySet[%d] with binary[%c] \n",binarySet[j], binary[i]);
                 binarySet[j] = binary[i];
+                //printf("binaryset[%d]: %c\n",binarySet[j],binarySet[i]);
                 j++;
             }
         }
@@ -395,6 +457,8 @@ void getRD(char rd[3],char binary[32],char format){
 
         // places binary as integer into rd
         sprintf(result, "%d", binaryAsInt);
+        //printf("result: %s \n", result);
+        //return result;
         strcpy(rd,result);
 
     } else {
@@ -402,6 +466,7 @@ void getRD(char rd[3],char binary[32],char format){
         result[0] = '-';
         result[1] = '\0';
         strcpy(rd,result);
+        //return result;
     }
 }
 
@@ -414,13 +479,19 @@ void getRS(char rs[3],char binary[32]){
     char result[3];
     char binarySet[6];
     int binaryAsInt = 0;
+    //printf("binary: %s \n", binary);
 
     // read digits 6-10 of binary
     // convert int value to 2 digit int string
     int j = 0;
     for(int i = 0; i < 34; i++){
+        //printf("int i: %d \n", i);
         if( i >=6  && i <=10){
+            //printf("int i: %d \n", i);
+            //printf("int j: %d \n", j);
+            //printf("setting binarySet[%d] with binary[%c] \n",binarySet[j], binary[i]);
             binarySet[j] = binary[i];
+            //printf("binaryset[%d]: %c\n",binarySet[j],binarySet[i]);
             j++;
         }
     }
@@ -431,6 +502,8 @@ void getRS(char rs[3],char binary[32]){
 
     // places binary as integer into rd
     sprintf(result, "%d", binaryAsInt);
+    //printf("result: %s \n", result);
+    //return result;
     strcpy(rs,result);
 
 }
@@ -464,6 +537,8 @@ void getRT(char rt[3],char binary[32]){
 
     // places binary as integer into rd
     sprintf(result, "%d", binaryAsInt);
+    //printf("result: %s \n", result);
+    //return result;
     strcpy(rt,result);
 }
 
@@ -477,7 +552,7 @@ void getImm(char format,char binary[32],char Imm[5]){
     char result[5];
     char binarySet[16];
     int hexAsInt = 0;
-    //printf("binary: %s \n", binary);
+    printf("binary: %s \n", binary);
     // ONLY I instruction format will have func value
     // return Immediate hex
     if(format == 'I'){
@@ -486,6 +561,9 @@ void getImm(char format,char binary[32],char Imm[5]){
         int j = 0;
         for(int i = 0; i < 32; i++){
             if( i >= 16){
+                printf("int i: %d \n", i);
+                //printf("setting binarySet[%c] with binary[%c] \n",binarySet[i], binary[i]);
+                printf("setting binarySet[%d] with binary[%c] \n",j, binary[i]);
                 binarySet[j] = binary[i];
                 j++;
             }
@@ -494,13 +572,20 @@ void getImm(char format,char binary[32],char Imm[5]){
         // set last value as null terminator
         binarySet[16] = '\0';
 
+        printf("binarySet %s \n", binarySet);
         hexAsInt = binaryToInteger(binarySet);
 
         // places HexAsInt as a hex value into result
+        printf("hex: %x \n", hexAsInt);
         sprintf(result, "%x", hexAsInt);
+        printf("result: %s \n", result);
 
-        // add leading zeros as necessary
         leadingZeroImm(result,Imm);
+
+        //printf("strlen: %d \n",strlen(result));
+        //strcpy(Imm,result);
+
+        //need to add leading zeros if necessary?
 
     } else {
         // Format is R instruction, which has no function code
@@ -508,12 +593,15 @@ void getImm(char format,char binary[32],char Imm[5]){
         result[1] = '\0';
         strcpy(Imm,result);
     }
+
+
+    // IE: 24020004 = 0044
 }
 
 void leadingZeroImm(char result[5],char Imm[5]){
 
     int len = strlen(result);
-    //printf("strlen: %d \n", len);
+    printf("strlen: %d \n", len);
 
     char temp[4];
 
@@ -524,6 +612,7 @@ void leadingZeroImm(char result[5],char Imm[5]){
             temp[2] = '0';
             temp[3] = result[0];
             temp[4] = '\0';
+            printf("hello1 \n");
             strcpy(Imm,temp);
             break;
         case 2:
@@ -532,6 +621,7 @@ void leadingZeroImm(char result[5],char Imm[5]){
             temp[2] = result[0];
             temp[3] = result[1];
             temp[4] = '\0';
+            printf("hello2 \n");
             strcpy(Imm,temp);
             break;
         case 3:
@@ -540,6 +630,7 @@ void leadingZeroImm(char result[5],char Imm[5]){
             temp[2] = result[1];
             temp[3] = result[2];
             temp[4] = '\0';
+            printf("hello3 \n");
             strcpy(Imm,temp);
             break;
         case 4:
@@ -548,14 +639,22 @@ void leadingZeroImm(char result[5],char Imm[5]){
             temp[2] = result[2];
             temp[3] = result[3];
             temp[4] = '\0';
+            printf("hello4 \n");
             strcpy(Imm,temp);
             break;
         default:
             // no Imm value
+            printf("hello5 \n");
+            strcat(Imm, "-");
             break;
     }
 
 }
+/*
+char integerToHex(const char *s){
+  return (int) strtol(s, NULL, 2);
+}
+*/
 
 int binaryToInteger(const char *s){
   return (int) strtol(s, NULL, 2);
@@ -567,6 +666,7 @@ void writeToFile(link x){
     //skips uninitialized node
     x=x->next;
 
+    printf("\n");
     if(x==NULL){
         return;
     } else if(x->next==NULL){
