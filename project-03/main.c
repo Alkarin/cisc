@@ -38,6 +38,7 @@ Use printAll to display all instructionSets
 
 
 // struct declarations
+// alias for struct instructionSet* with name "link"
 typedef struct instructionSet* link;
 
 struct instructionSet {
@@ -67,7 +68,7 @@ struct instructionSet {
   char rt[3];
 
   //hex
-  int Imm;
+  char Imm[5];
 
   link next;
 };
@@ -82,6 +83,7 @@ void getMIPS(char instruction[6],char opcode[3],char format,char func[3]);
 void getRD(char rd[3],char binary[32],char format);
 void getRS(char rs[3],char binary[32]);
 void getRT(char rt[3],char binary[32]);
+void getImm(char format,char binary[32],char Imm[5]);
 
 //typedef short int16_t
 
@@ -117,6 +119,8 @@ int main(int argc, char* argv[]){
                 }
                 i++;
             }
+            // NOTE:
+            //since we are automatically going to next node, head node is never initialized
 
             // allocate memory for next node
             node->next = malloc(sizeof(*node));
@@ -136,6 +140,7 @@ int main(int argc, char* argv[]){
             getRD(node->rd,node->binary,node->format);
             getRS(node->rs,node->binary);
             getRT(node->rt,node->binary);
+            getImm(node->format,node->binary,node->Imm);
 
             printf("\n");
         }
@@ -474,7 +479,7 @@ void getRS(char rs[3],char binary[32]){
     char result[3];
     char binarySet[6];
     int binaryAsInt = 0;
-    printf("binary: %s \n", binary);
+    //printf("binary: %s \n", binary);
 
     // read digits 6-10 of binary
     // convert int value to 2 digit int string
@@ -509,7 +514,7 @@ void getRT(char rt[3],char binary[32]){
     char result[3];
     char binarySet[6];
     int binaryAsInt = 0;
-    printf("binary: %s \n", binary);
+    //printf("binary: %s \n", binary);
 
     // read digits 6-10 of binary
     // convert int value to 2 digit int string
@@ -517,11 +522,11 @@ void getRT(char rt[3],char binary[32]){
     for(int i = 0; i < 34; i++){
         //printf("int i: %d \n", i);
         if( i >=11  && i <=15){
-            printf("int i: %d \n", i);
-            printf("int j: %d \n", j);
-            printf("setting binarySet[%d] with binary[%c] \n",binarySet[j], binary[i]);
+            //printf("int i: %d \n", i);
+            //printf("int j: %d \n", j);
+            //printf("setting binarySet[%d] with binary[%c] \n",binarySet[j], binary[i]);
             binarySet[j] = binary[i];
-            printf("binaryset[%d]: %c\n",binarySet[j],binarySet[i]);
+            //printf("binaryset[%d]: %c\n",binarySet[j],binarySet[i]);
             j++;
         }
     }
@@ -532,15 +537,118 @@ void getRT(char rt[3],char binary[32]){
 
     // places binary as integer into rd
     sprintf(result, "%d", binaryAsInt);
-    printf("result: %s \n", result);
+    //printf("result: %s \n", result);
     //return result;
     strcpy(rt,result);
 }
 
-getImm(){
+
+void getImm(char format,char binary[32],char Imm[5]){
+    //IF R set '-'
+    // IF I get value
     // return Immediate value
-    //which is last 4 digits of machineCode
+    //which is last 16 digits of machineCode
+
+    char result[5];
+    char binarySet[16];
+    int hexAsInt = 0;
+    printf("binary: %s \n", binary);
+    // ONLY I instruction format will have func value
+    // return Immediate hex
+    if(format == 'I'){
+        // read last 16 digits of binary
+        // convert int value to 2 digit hex string
+        int j = 0;
+        for(int i = 0; i < 32; i++){
+            if( i >= 16){
+                printf("int i: %d \n", i);
+                //printf("setting binarySet[%c] with binary[%c] \n",binarySet[i], binary[i]);
+                printf("setting binarySet[%d] with binary[%c] \n",j, binary[i]);
+                binarySet[j] = binary[i];
+                j++;
+            }
+        }
+
+        // set last value as null terminator
+        binarySet[16] = '\0';
+
+        printf("binarySet %s \n", binarySet);
+        hexAsInt = binaryToInteger(binarySet);
+
+        // places HexAsInt as a hex value into result
+        printf("hex: %x \n", hexAsInt);
+        sprintf(result, "%x", hexAsInt);
+        printf("result: %s \n", result);
+
+        leadingZeroImm(result,Imm);
+
+        //printf("strlen: %d \n",strlen(result));
+        //strcpy(Imm,result);
+
+        //need to add leading zeros if necessary?
+
+    } else {
+        // Format is R instruction, which has no function code
+        result[0] = '-';
+        result[1] = '\0';
+        strcpy(Imm,result);
+    }
+
+
     // IE: 24020004 = 0044
+}
+
+void leadingZeroImm(char result[5],char Imm[5]){
+
+    int len = strlen(result);
+    printf("strlen: %d \n", len);
+
+    char temp[4];
+
+    switch(len){
+        case 1:
+            temp[0] = '0';
+            temp[1] = '0';
+            temp[2] = '0';
+            temp[3] = result[0];
+            temp[4] = '\0';
+            printf("hello1 \n");
+            strcpy(Imm,temp);
+            break;
+        case 2:
+            temp[0] = '0';
+            temp[1] = '0';
+            temp[2] = result[0];
+            temp[3] = result[1];
+            temp[4] = '\0';
+            printf("hello2 \n");
+            strcpy(Imm,temp);
+            break;
+        case 3:
+            temp[0] = '0';
+            temp[1] = result[0];
+            temp[2] = result[1];
+            temp[3] = result[2];
+            temp[4] = '\0';
+            printf("hello3 \n");
+            strcpy(Imm,temp);
+            break;
+        case 4:
+            temp[0] = result[0];
+            temp[1] = result[1];
+            temp[2] = result[2];
+            temp[3] = result[3];
+            temp[4] = '\0';
+            printf("hello4 \n");
+            strcpy(Imm,temp);
+            break;
+        default:
+            // no Imm value
+            printf("hello5 \n");
+            strcat(Imm, "-");
+            break;
+    }
+
 }
 /*
 char integerToHex(const char *s){
@@ -562,18 +670,9 @@ void writeToFile(link x){
     if(x==NULL){
         return;
     } else if(x->next==NULL){
-        fprintf(fp,"machineCode: %s \n", x->machineCode);
-        fprintf(fp,"Binary number: %s \n", x->binary);
-        //fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
-        fprintf(fp,"End\n");
+        fprintf(fp,"%s,%s,%s,%s,%c,%s,%s,%s,%s \n", x->machineCode,x->opcode,x->func,x->instruction,x->format,x->rd,x->rs,x->rt,x->Imm);
     } else while(x!=NULL){
-        /*
-        fprintf(fp,"machineCode: %s \n", x->machineCode);
-        fprintf(fp,"Binary number: %s \n", x->binary);
-        fprintf(fp,"Opcode: %c \n", integerToHex(x->opcode));
-        fprintf(fp,"\n");
-        */
-        fprintf(fp,"%s,%s,%s,%s,%s,%c,%s,%s,%s \n", x->machineCode,x->binary,x->opcode,x->func,x->instruction,x->format,x->rd,x->rs,x->rt);
+        fprintf(fp,"%s,%s,%s,%s,%c,%s,%s,%s,%s \n", x->machineCode,x->opcode,x->func,x->instruction,x->format,x->rd,x->rs,x->rt,x->Imm);
         x=x->next;
     }
     return;
