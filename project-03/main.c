@@ -21,7 +21,6 @@ Various links
 // https://www.eg.bucknell.edu/~csci320/mips_web/
 */
 
-
 // struct declarations
 // alias for struct instructionSet* with name "link"
 typedef struct instructionSet* link;
@@ -465,7 +464,6 @@ void getRT(char rt[3],char binary[32]){
     strcpy(rt,result);
 }
 
-
 void getImm(char format,char binary[32],char Imm[5]){
     //IF R set '-'
     // IF I get value
@@ -649,5 +647,4 @@ char* convertHexToBinary(char* hex){
 
     //printf("Binary number   : %s \n", binaryInstruction);
     return binaryInstruction;
-
 }
