@@ -474,7 +474,6 @@ void getImm(char format,char binary[32],char Imm[5]){
     char result[5];
     char binarySet[16];
     int hexAsInt = 0;
-    printf("binary: %s \n", binary);
 
     // ONLY I instruction format will have func value
     // return Immediate hex
@@ -511,7 +510,7 @@ void getImm(char format,char binary[32],char Imm[5]){
 void leadingZeroImm(char result[5],char Imm[5]){
 
     int len = strlen(result);
-    printf("strlen: %d \n", len);
+    //printf("strlen: %d \n", len);
 
     char temp[4];
 
@@ -522,7 +521,6 @@ void leadingZeroImm(char result[5],char Imm[5]){
             temp[2] = '0';
             temp[3] = result[0];
             temp[4] = '\0';
-            printf("hello1 \n");
             strcpy(Imm,temp);
             break;
         case 2:
@@ -531,7 +529,6 @@ void leadingZeroImm(char result[5],char Imm[5]){
             temp[2] = result[0];
             temp[3] = result[1];
             temp[4] = '\0';
-            printf("hello2 \n");
             strcpy(Imm,temp);
             break;
         case 3:
@@ -540,7 +537,6 @@ void leadingZeroImm(char result[5],char Imm[5]){
             temp[2] = result[1];
             temp[3] = result[2];
             temp[4] = '\0';
-            printf("hello3 \n");
             strcpy(Imm,temp);
             break;
         case 4:
@@ -549,13 +545,10 @@ void leadingZeroImm(char result[5],char Imm[5]){
             temp[2] = result[2];
             temp[3] = result[3];
             temp[4] = '\0';
-            printf("hello4 \n");
             strcpy(Imm,temp);
             break;
         default:
             // no Imm value
-            printf("hello5 \n");
-            strcat(Imm, "-");
             break;
     }
 
@@ -571,7 +564,6 @@ void writeToFile(link x){
     //skips uninitialized node
     x=x->next;
 
-    printf("\n");
     if(x==NULL){
         return;
     } else if(x->next==NULL){
