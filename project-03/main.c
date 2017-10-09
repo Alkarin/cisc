@@ -32,8 +32,6 @@ struct instructionSet {
   char* machineCode[8];
   // instruction converted to 32bit binary
   char binary[32];
-
-  int binaryAsNum;
   //hex value
   char opcode[3];
   //hex value
