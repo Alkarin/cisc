@@ -557,11 +557,12 @@ int binaryToInteger(const char *s){
 }
 
 void writeToFile(link x){
-    FILE* fp = fopen("out.csv", "w"); //to write
+    FILE* fp = fopen("output.csv", "w"); //to write
 
     //skips uninitialized node
     x=x->next;
 
+        fprintf(fp,"Machine code, opcode (hex), func (hex),MIPS Inst, Format,rd,rs,rt,Imm (hex) \n");
     if(x==NULL){
         return;
     } else if(x->next==NULL){
