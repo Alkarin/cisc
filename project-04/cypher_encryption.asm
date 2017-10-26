@@ -34,7 +34,6 @@
 
 #encrypt_decrypt: .byte 0x0b:4
 
-addition_key: .byte 0x0c:4
 toggle_key: .byte 0x0d:4
 text_buffer: .byte 0x0a:80
 encryption_result: .byte 0x0e:80
@@ -49,12 +48,9 @@ prompt3: .asciiz "Enter bit toggle key:\t"
 prompt4: .asciiz "Enter text to encrypt:\t"
 prompt5: .asciiz "Encrypted text:\t"
 newline: .asciiz "\n"
-boolean_e: .asciiz "e"
-boolean_d: .asciiz "d"
 debug: .asciiz "DEBUG \n"
 debug2: .asciiz "DEBUG2 \n"
 debug3: .asciiz "DEBUG3 \n"
-encrypt_decrypt: .space 1
 
 ############################################################
 .text
@@ -71,11 +67,6 @@ encrypt_decrypt: .space 1
 	#set s1 with user char input
 	la $s0, 0($v0)
 	
-	#display user input
-	li $v0, 4
-	la $a0, encrypt_decrypt
-	syscall
-	
 	#display newline in console
 	la $a0, newline
 	li $v0, 4
@@ -86,14 +77,23 @@ encrypt_decrypt: .space 1
 	li $v0, 4
 	syscall
 	
-	la $a0, addition_key 
-	la $a1, 4
-	li $v0, 8 
+	# read input integer
+	li $v0, 5 
 	syscall
 	
+	#set s1 with user char input
+	la $s1, 0($v0)
+	
+	#display newline in console
 	la $a0, newline
 	li $v0, 4
 	syscall
+	
+	#DEBUG COMPARATOR
+	la $t0, 4
+	la $t1, 1
+	beq $s1, $t0, ENCRYPT
+	beq $s1, $t1, DECRYPT
 	
 #Prompt the user for the bit toggle key
 	
