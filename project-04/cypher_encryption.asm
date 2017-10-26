@@ -31,11 +31,13 @@
 
 # give me 100 of 0x0a
 #buffer: .byte 0x0a:100
-encrypt_decrypt: .byte 0x0a:4
-addition_key: .byte 0x0a:4
-toggle_key: .byte 0x0a:4
-text_buffer: .byte 0x0a:100
-encryption_result: .byte 0x0a:100
+
+#encrypt_decrypt: .byte 0x0b:4
+
+addition_key: .byte 0x0c:4
+toggle_key: .byte 0x0d:4
+text_buffer: .byte 0x0a:80
+encryption_result: .byte 0x0e:80
 
 buffer1: .space 100
 
@@ -47,6 +49,12 @@ prompt3: .asciiz "Enter bit toggle key:\t"
 prompt4: .asciiz "Enter text to encrypt:\t"
 prompt5: .asciiz "Encrypted text:\t"
 newline: .asciiz "\n"
+boolean_e: .asciiz "e"
+boolean_d: .asciiz "d"
+debug: .asciiz "DEBUG \n"
+debug2: .asciiz "DEBUG2 \n"
+debug3: .asciiz "DEBUG3 \n"
+encrypt_decrypt: .space 1
 
 ############################################################
 .text
@@ -55,19 +63,20 @@ newline: .asciiz "\n"
 	la $a0, prompt1
 	li $v0, 4
 	syscall
-	
-	# Enter user input into memory called "buffer"
-	# RECIEVE INPUT VIA CONSOLE SYSCALL
-	# (Eventually place this in a function)
 
-	# give address of input buffer
-	la $a0, encrypt_decrypt
-	# set size of string length we will read(?) 
-	la $a1, 1
-	# read input string
-	li $v0, 8 
+	# read input character
+	li $v0, 12			
 	syscall
 	
+	#set s1 with user char input
+	la $s0, 0($v0)
+	
+	#display user input
+	li $v0, 4
+	la $a0, encrypt_decrypt
+	syscall
+	
+	#display newline in console
 	la $a0, newline
 	li $v0, 4
 	syscall
@@ -78,7 +87,7 @@ newline: .asciiz "\n"
 	syscall
 	
 	la $a0, addition_key 
-	la $a1, 1
+	la $a1, 4
 	li $v0, 8 
 	syscall
 	
@@ -93,7 +102,7 @@ newline: .asciiz "\n"
 	syscall
 	
 	la $a0, toggle_key 
-	la $a1, 1
+	la $a1, 4
 	li $v0, 8 
 	syscall
 	
@@ -111,6 +120,19 @@ newline: .asciiz "\n"
 	li $v0, 8 
 	syscall
 	
+	#NOW DO FUNCTIONS
+	
+	#branch to appropriate function
+	beq $s0, 'e', ENCRYPT
+	beq $s0, 'd', DECRYPT
+	
+	# debug output
+	la $a0, debug3
+	li $v0, 4
+	syscall
+	
+	j END
+	
 #Display encrpyed text result
 	la $a0, prompt5
 	li $v0, 4
@@ -119,8 +141,24 @@ newline: .asciiz "\n"
 	# do a call for the result
 	#encryption_result
 
+
+ENCRYPT:
+	la $a0, debug
+	li $v0, 4
+	syscall
+	j END
+
+DECRYPT:
+	la $a0, debug2
+	li $v0, 4
+	syscall
 	
+	j END
 	
+END:
+#terminates program
+li $v0, 10
+syscall
 	
 ##############################################################################################################################################################################
 	
@@ -145,21 +183,21 @@ newline: .asciiz "\n"
 	
 	
 # APPLY ADDITION 
-	la 	$t0, msg	# HARDCODED msg: needs to be user input
-	lb 	$t1, 0 ($t0) 	# load byte # will want in loop to load the next byte, +1 cause byte
-	addi 	$t1, $t1, 4 	# this 4 is coming from user for 'add' so $v0 
+	#la 	$t0, msg	# HARDCODED msg: needs to be user input
+	#lb 	$t1, 0 ($t0) 	# load byte # will want in loop to load the next byte, +1 cause byte
+	#addi 	$t1, $t1, 4 	# this 4 is coming from user for 'add' so $v0 
 	# add $t1, $t1, $v0
 	
 	# maybe create another space as to not overwrite msg?
 
 # APPLY TOGGLE
 # again will be from user input
-	li	$s0, 0x01 	# HARDCOED 0x01: gives value of 0000 0001
-	li	$v0, 3 		# 3 is user input value, probably wont need this line at all, 
-	sllv	$s0, $s0, $v0 	# instead of $v0, just use input 'toggle' value
+	#li	$s0, 0x01 	# HARDCOED 0x01: gives value of 0000 0001
+	#li	$v0, 3 		# 3 is user input value, probably wont need this line at all, 
+	#sllv	$s0, $s0, $v0 	# instead of $v0, just use input 'toggle' value
 	
 	# exclusive OR for $t1 against $s0
-	xor	$t4, $t1, $s0 	#only using $t4 instead of $t1 to see differences 
+	#xor	$t4, $t1, $s0 	#only using $t4 instead of $t1 to see differences 
 	
 	#0100 1000 original
 	#0100 1100 encrypted from add 4
