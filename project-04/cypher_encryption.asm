@@ -147,28 +147,16 @@ RESULT:
 	j END
 
 ENCRYPT:
-	# prologue
-	addi	$sp, $sp, -4
-	sw	$ra, 0($sp)
-	
+
     	la $s5, text_buffer     #s0 text iterating through
     	la $t1, 0($s1)     	#s1 add value
     	li $t0, 0       	#t0 iterator count: 0
 	
-	# call another look to do this as many times as add value?
+	# call function to encrypt each char
 	jal encryptCharLoop
 	
-	#epilogue
-	lw	$ra, 0($sp)
-	addi	$sp, $sp, 4
-	
+	# display result
 	j RESULT
-
-	# display debug string
-	la $a0, debug
-	li $v0, 4
-	syscall
-	j END
 
 encryptCharLoop:
 
@@ -179,14 +167,9 @@ encryptCharLoop:
     	
     	#APPLY_TOGGLE
     	# set bit toggle value from user input
-	la	$t4, 0x01 	# HARDCOED 0x01: gives value of 0000 0001
-	sllv	$t4, $t4, $s2 	# $s2 is toggle value to correct bit index
-	
-	# exclusive OR for $t1 against $s0
-	xor	$s7, $s7, $t4 	# xor s7 against t4 bit value
-	# END APPLY_TOGGLE
-    					
-	#jal APPLY_TOGGLE		# toggle char by toggle value
+	la	$t4, 0x01 		# HARDCODED 0x01: gives value of 0000 0001
+	sllv	$t4, $t4, $s2 		# $s2 is toggle value to correct bit index
+	xor	$s7, $s7, $t4 		# xor s7 against t4 bit value
     					
     	sb 	$s7, ($s6)       	# Changing the character in text_buffer to the shifted character
     	addi 	$t0, $t0, 1    		# increment iterator +1
