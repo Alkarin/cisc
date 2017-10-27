@@ -30,16 +30,11 @@
 
 
 # give me 100 of 0x0a
-#buffer: .byte 0x0a:100
-
-#encrypt_decrypt: .byte 0x0b:4
-
-toggle_key: .byte 0x0d:4
-text_buffer: .byte 0x0a:80
+#text_buffer: .byte 0x0a:80
 encryption_result: .byte 0x0e:80
 
 buffer1: .space 100
-
+text_buffer: . space 100
 
 msg : .asciiz "Hello World!" # hardcoded for example
 prompt1: .asciiz "Enter 'e' or 'd' to select encrypt or decrypt:\t"
@@ -52,6 +47,14 @@ debug: .asciiz "DEBUG \n"
 debug2: .asciiz "DEBUG2 \n"
 debug3: .asciiz "DEBUG3 \n"
 
+add_value: .word 0
+
+# SAVED REGISTERS
+# s0	'e' or 'd'
+# s1	Addition key
+# s2	Toggle key
+# s3	Addition increment count
+# s4	Other increment count
 ############################################################
 .text
 
@@ -81,7 +84,7 @@ debug3: .asciiz "DEBUG3 \n"
 	li $v0, 5 
 	syscall
 	
-	#set s1 with user char input
+	#set s1 with user int input
 	la $s1, 0($v0)
 	
 	#display newline in console
@@ -89,23 +92,20 @@ debug3: .asciiz "DEBUG3 \n"
 	li $v0, 4
 	syscall
 	
-	#DEBUG COMPARATOR
-	la $t0, 4
-	la $t1, 1
-	beq $s1, $t0, ENCRYPT
-	beq $s1, $t1, DECRYPT
-	
 #Prompt the user for the bit toggle key
 	
 	la $a0, prompt3
 	li $v0, 4
 	syscall
 	
-	la $a0, toggle_key 
-	la $a1, 4
-	li $v0, 8 
+	# read input integer
+	li $v0, 5 
 	syscall
 	
+	#set s2 with user int input
+	la $s2, 0($v0)
+	
+	#display newline in console
 	la $a0, newline
 	li $v0, 4
 	syscall
@@ -115,9 +115,15 @@ debug3: .asciiz "DEBUG3 \n"
 	li $v0, 4
 	syscall
 	
+	# getting text from user
 	la $a0, text_buffer
 	la $a1, 20
 	li $v0, 8 
+	syscall
+	
+	# display user input
+	li $v0, 4
+	la $a0, text_buffer
 	syscall
 	
 	#NOW DO FUNCTIONS
@@ -126,14 +132,11 @@ debug3: .asciiz "DEBUG3 \n"
 	beq $s0, 'e', ENCRYPT
 	beq $s0, 'd', DECRYPT
 	
-	# debug output
-	la $a0, debug3
-	li $v0, 4
-	syscall
-	
+	#precautionary end program
 	j END
 	
 #Display encrpyed text result
+RESULT:
 	la $a0, prompt5
 	li $v0, 4
 	syscall
@@ -143,10 +146,33 @@ debug3: .asciiz "DEBUG3 \n"
 
 
 ENCRYPT:
+    	la $s5, text_buffer     #s0 text iterating through
+    	sw $t1, 0($s2)     	#s1 add value
+    	li $t0, 0       	#t0 iterator count: 0
+	
+	j encryptCharLoop
+	
+	# display encryped
+	li $v0, 4
+	la $a0, 0($s0)
+	syscall
+
 	la $a0, debug
 	li $v0, 4
 	syscall
 	j END
+
+encryptCharLoop:
+   	add 	$s6, $s5, $t0		# $s6 = text_buffer[i]
+    	lb 	$s7, 0($s6)     	# Loading char to shift into $s7
+    	beq 	$s7, $zero, exitLoop	# Breaking the loop if we've reached the end: http://stackoverflow.com/questions/12739463/how-to-iterate-a-string-in-mips-assembly
+    	add 	$s7, $s7, $t1   	# Shift char by add value
+    	sb 	$s7, ($s6)       	# Changing the character in text_buffer to the shifted character
+    	addi 	$t0, $t0, 1    		# increment iterator +1
+    	j encryptCharLoop    		# continue loop
+    	
+    	exitLoop:
+ 	jr $ra				# jump to return address
 
 DECRYPT:
 	la $a0, debug2
@@ -155,32 +181,21 @@ DECRYPT:
 	
 	j END
 	
+
+PrintEncryptedChar:
+	# display encrypted char
+	#li $v0, 4
+	#la $a0, 0($t3)
+	#syscall
+
+PrintDecryptedChar:
+	
 END:
 #terminates program
 li $v0, 10
 syscall
 	
 ##############################################################################################################################################################################
-	
-# Prompt the user for the string
-	#la $a0, prompt1
-	#li $v0, 4
-	#syscall
-
-
-# Enter user input into memory called "buffer"
-	# RECIEVE INPUT VIA CONSOLE SYSCALL
-	# (Eventually place this in a function)
-
-	# give address of input buffer
-	#la $a0, buffer
-	# set size of string length we will read(?) 
-	#la $a1, 10
-	# read input string
-	#li $v0, 8 
-	# executes the above call
-	#syscall
-	
 	
 # APPLY ADDITION 
 	#la 	$t0, msg	# HARDCODED msg: needs to be user input
