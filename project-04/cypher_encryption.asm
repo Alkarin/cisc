@@ -31,10 +31,8 @@
 
 # give me 100 of 0x0a
 #text_buffer: .byte 0x0a:80
-encryption_result: .byte 0x0e:80
-
-buffer1: .space 100
-text_buffer: . space 100
+encryption_result: .byte 0x10:80
+text_buffer: .byte 0x0e:100
 
 msg : .asciiz "Hello World!" # hardcoded for example
 prompt1: .asciiz "Enter 'e' or 'd' to select encrypt or decrypt:\t"
@@ -146,15 +144,19 @@ RESULT:
 
 
 ENCRYPT:
+	
     	la $s5, text_buffer     #s0 text iterating through
-    	sw $t1, 0($s2)     	#s1 add value
+    	la $t1, 0($s1)     	#s1 add value
     	li $t0, 0       	#t0 iterator count: 0
 	
-	j encryptCharLoop
+	# call another look to do this as many times as add value?
+	jal encryptCharLoop
+	
+	
 	
 	# display encryped
 	li $v0, 4
-	la $a0, 0($s0)
+	la $a0, text_buffer
 	syscall
 
 	la $a0, debug
@@ -173,6 +175,9 @@ encryptCharLoop:
     	
     	exitLoop:
  	jr $ra				# jump to return address
+
+encryptCharToggleLoop:
+
 
 DECRYPT:
 	la $a0, debug2
@@ -216,7 +221,7 @@ syscall
 	
 	#0100 1000 original
 	#0100 1100 encrypted from add 4
-	#0000 1000 XOR value
+	#0000 1000 XOR value toggle of 3 (3+1 = index 4)
 	#----------
 	#0100 0100 XOR result (encrypted)
 	
