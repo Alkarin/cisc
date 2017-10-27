@@ -20,17 +20,10 @@
 # ---------------
 # 0100 0100 #result, which was the original 
 
-
-
 # ---------------------------------------------
 .data
 
-#use help syscall to get user input 
-
-
-
 # give me 100 of 0x0a
-#text_buffer: .byte 0x0a:80
 encryption_result: .byte 0x10:80
 text_buffer: .byte 0x0e:100
 
@@ -45,8 +38,6 @@ debug: .asciiz "DEBUG \n"
 debug2: .asciiz "DEBUG2 \n"
 debug3: .asciiz "DEBUG3 \n"
 
-add_value: .word 0
-
 # SAVED REGISTERS
 # s0	'e' or 'd'
 # s1	Addition key
@@ -56,6 +47,7 @@ add_value: .word 0
 ############################################################
 .text
 
+main:
 # Prompt the user for encryption or decryption
 	la $a0, prompt1
 	li $v0, 4
@@ -127,24 +119,6 @@ add_value: .word 0
 	
 	#precautionary end program
 	j END
-	
-#Display encrpyed text result
-RESULT:
-	la $a0, prompt5
-	li $v0, 4
-	syscall
-	
-	# display encryped
-	li $v0, 4
-	la $a0, text_buffer
-	syscall
-	
-	#display newline in console
-	la $a0, newline
-	li $v0, 4
-	syscall
-	
-	j END
 
 ENCRYPT:
 
@@ -157,6 +131,14 @@ ENCRYPT:
 	
 	# display result
 	j RESULT
+	
+DECRYPT:
+
+	la $a0, debug2
+	li $v0, 4
+	syscall
+	
+	j END	
 
 encryptCharLoop:
 
@@ -178,9 +160,21 @@ encryptCharLoop:
     	exitLoop:
  	jr $ra				# jump to return address
 
+dencryptCharLoop:
 
-DECRYPT:
-	la $a0, debug2
+#Display encrpyed text result
+RESULT:
+	la $a0, prompt5
+	li $v0, 4
+	syscall
+	
+	# display encryped
+	li $v0, 4
+	la $a0, text_buffer
+	syscall
+	
+	#display newline in console
+	la $a0, newline
 	li $v0, 4
 	syscall
 	
