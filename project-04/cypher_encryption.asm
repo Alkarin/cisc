@@ -37,6 +37,7 @@ prompt3: .asciiz "Enter bit toggle key:\t"
 prompt4: .asciiz "Enter text to encrypt:\t"
 prompt5: .asciiz "Encrypted text:\t"
 prompt6: .asciiz "Decrypted text:\t"
+validation1: .asciiz "Invalid command input, please enter 'e' or 'd' to select encrypt or decrypt.\n"
 newline: .asciiz "\n"
 debug: .asciiz "DEBUG \n"
 debug2: .asciiz "DEBUG2 \n"
@@ -119,6 +120,14 @@ main:
 	#branch to appropriate function
 	beq $s0, 'e', ENCRYPT
 	beq $s0, 'd', DECRYPT
+	
+	# Invalid command input
+	la $a0, validation1
+	li $v0, 4
+	syscall
+	
+	# request user input again
+	j main
 	
 	#precautionary end program
 	j END
@@ -222,13 +231,40 @@ RESULT2:
 	syscall
 	
 	j END
-	
+				
 END:
 #terminates program
 li $v0, 10
 syscall
-			
-	
+		
+				
+# Trap handler
+.ktext 0x80000180
+
+	move $k0, $v0		# Save $v0 value
+	move $k1, $a0		# Save $a0 value
+
+	mfc0 $k0, $13		# get cause
+	srl  $k0, $k0, 2	# determine cause
+
+	# display trap message
+	la $a0, TRAP		
+	li $v0, 4		
+	syscall
+
+	move $v0, $k0		# Restore $v0
+	move $a0, $k1		# Restore $a0
+	mfc0 $k0, $14		# Coprocessor 0 register $14 takes address of trap
+	addi $k0,$k0,4		# Add 4 to point to next instruction
+	mfc0 $k0, $14		# Store new address back into $14
+	eret			# Return error, set PC value to value in $14
+
+.kdata
+
+TRAP:
+	.asciiz "Trap generated"
+
+
 	
 	
 	
