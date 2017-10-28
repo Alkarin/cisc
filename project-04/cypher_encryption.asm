@@ -87,7 +87,6 @@ main:
 	syscall
 	
 #Prompt the user for the bit toggle key
-	
 	la $a0, prompt3
 	li $v0, 4
 	syscall
@@ -147,12 +146,6 @@ DECRYPT:
 	
 	# display result
 	j RESULT2
-
-	la $a0, debug2
-	li $v0, 4
-	syscall
-	
-	j END	
 
 encryptCharLoop:
 
