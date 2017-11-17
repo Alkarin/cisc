@@ -1,4 +1,7 @@
-#cypher encryption
+# Alexander Vaughan, av1045643
+# av1045643@swccd.edu
+
+# caesar cipher encryption
 
 # ask user for string input
 # ask for add value
@@ -33,6 +36,7 @@ prompt2: .asciiz "Enter addition key:\t"
 prompt3: .asciiz "Enter bit toggle key:\t"
 prompt4: .asciiz "Enter text to encrypt:\t"
 prompt5: .asciiz "Encrypted text:\t"
+prompt6: .asciiz "Decrypted text:\t"
 newline: .asciiz "\n"
 debug: .asciiz "DEBUG \n"
 debug2: .asciiz "DEBUG2 \n"
@@ -83,7 +87,6 @@ main:
 	syscall
 	
 #Prompt the user for the bit toggle key
-	
 	la $a0, prompt3
 	li $v0, 4
 	syscall
@@ -134,11 +137,15 @@ ENCRYPT:
 	
 DECRYPT:
 
-	la $a0, debug2
-	li $v0, 4
-	syscall
+	sub $t1, $zero $s1	# subtract s1 add value
+    	la $s5, text_buffer     #s0 text iterating through    	
+    	li $t0, 0       	#t0 iterator count: 0
 	
-	j END	
+	# call function to encrypt each char
+	jal dencryptCharLoop
+	
+	# display result
+	j RESULT2
 
 encryptCharLoop:
 
@@ -162,9 +169,45 @@ encryptCharLoop:
 
 dencryptCharLoop:
 
-#Display encrpyed text result
+   	add 	$s6, $s5, $t0		# $s6 = text_buffer[i]
+    	lb 	$s7, 0($s6)     	# Loading char to shift into $s7
+    	beq 	$s7, $zero, exitLoop2	# Breaking the loop if we've reached the end: http://stackoverflow.com/questions/12739463/how-to-iterate-a-string-in-mips-assembly
+    	add 	$s7, $s7, $t1   	# Shift char by add value
+    	
+    	#APPLY_TOGGLE
+    	# set bit toggle value from user input
+	la	$t4, 0x01 		# HARDCODED 0x01: gives value of 0000 0001
+	sllv	$t4, $t4, $s2 		# $s2 is toggle value to correct bit index
+	xor	$s7, $s7, $t4 		# xor s7 against t4 bit value
+    					
+    	sb 	$s7, ($s6)       	# Changing the character in text_buffer to the shifted character
+    	addi 	$t0, $t0, 1    		# increment iterator +1
+    	j encryptCharLoop    		# continue loop
+	
+    	exitLoop2:
+ 	jr $ra				# jump to return address
+
+#Display encrypted text result
 RESULT:
 	la $a0, prompt5
+	li $v0, 4
+	syscall
+	
+	# display encryped
+	li $v0, 4
+	la $a0, text_buffer
+	syscall
+	
+	#display newline in console
+	la $a0, newline
+	li $v0, 4
+	syscall
+	
+	j END
+	
+#Display decrypted text result	
+RESULT2:
+	la $a0, prompt6
 	li $v0, 4
 	syscall
 	
@@ -184,39 +227,6 @@ END:
 #terminates program
 li $v0, 10
 syscall
-	
-##############################################################################################################################################################################
-	
-# APPLY ADDITION 
-	#la 	$t0, msg	# HARDCODED msg: needs to be user input
-	#lb 	$t1, 0 ($t0) 	# load byte # will want in loop to load the next byte, +1 cause byte
-	#addi 	$t1, $t1, 4 	# this 4 is coming from user for 'add' so $v0 
-	# add $t1, $t1, $v0
-	
-	# maybe create another space as to not overwrite msg?
-
-# APPLY TOGGLE
-# again will be from user input
-	#li	$s0, 0x01 	# HARDCOED 0x01: gives value of 0000 0001
-	#li	$v0, 3 		# 3 is user input value, probably wont need this line at all, 
-	#sllv	$s0, $s0, $v0 	# instead of $v0, just use input 'toggle' value
-	
-	# exclusive OR for $t1 against $s0
-	#xor	$t4, $t1, $s0 	#only using $t4 instead of $t1 to see differences 
-	
-	#0100 1000 original
-	#0100 1100 encrypted from add 4
-	#0000 1000 XOR value toggle of 3 (3+1 = index 4)
-	#----------
-	#0100 0100 XOR result (encrypted)
-	
-	
-	# DECRYPT
-	#la 	$t5, buffer
-	#sb 	$t4, 0($t5)
-	# Use toggle bit OXOR again
-	# subtract 'add' value
-	
 			
 	
 	
