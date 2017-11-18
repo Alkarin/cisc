@@ -11,6 +11,8 @@ project-03/scratchpad
 project-03/output.csv
 project-01/GeoLocation.java
 
+P5-hash-test_files_and_src_code/
+
 *.out
 *.cbp
 *.depend

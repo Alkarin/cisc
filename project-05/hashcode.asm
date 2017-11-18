@@ -1,7 +1,8 @@
-# Alexander Vaughan (av1045643)
+# Alexander Vaughan, av1045643
 # av1045643@swccd.edu
 
 # STRING TO HASCODE
+
 # 
 #
 #
