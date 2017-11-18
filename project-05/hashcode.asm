@@ -14,9 +14,11 @@ encryption_result: .byte 0x10:80
 text_buffer: .byte 0x0e:100
 
 
-prompt1: .asciiz "Please enter a file name:\t"
+prompt1: .asciiz "Please enter a file name: "
 input: 	 .asciiz "default.txt"      # filename for input
 buffer:  .asciiz ""
+newline: .asciiz "\n"
+debug: .asciiz "DEBUG \n"
 
 .text
 
@@ -35,6 +37,11 @@ main:
 	#NOW DO FUNCTIONS
 	
 	#branch to appropriate function
+	
+	#display debug in console
+	la $a0, debug
+	li $v0, 4
+	syscall
 	#j END
 	
 	#precautionary end program
