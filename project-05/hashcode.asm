@@ -16,8 +16,11 @@
 
 read: .byte 0x00:100
 filename: .byte 0x00:100		# filename for output
+hashvalue: .byte 0x00:100
 
 prompt1: .asciiz "Please enter a file name: "
+prompt2: .asciiz "File content:\n"
+prompt3: .asciiz "Hash value: "
 newline: .asciiz "\n"
 debug: .asciiz "DEBUG \n"
 
@@ -30,23 +33,34 @@ main:
 	li $v0, 4
 	syscall
 	
-	# getting text from user
+	# getting text(filename) from user
 	la $a0, filename
 	la $a1, 20
 	li $v0, 8 
 	syscall
 	
-	#NOW DO FUNCTIONS
-	li $s0,0        # Set index to 0
-	j REMOVE_NEWLINE
+#NOW DO FUNCTIONS
+	# Remove newline from filename input
+	li $s0,0        		# Set index to 0
+	jal REMOVE_NEWLINE
 	
-	#branch to appropriate function
-	j OPENFILE
+	# Now open and read file
+	jal OPENFILE
+	
+	# Display file content to user
+	jal CONTENT
+
+	# Hash file content
+	jal HASH
+	
+	# Display hashvalue
+	jal HASHVALUE
 	
 	#precautionary end program
 	j END
 	
 REMOVE_NEWLINE:
+
     	lb $a3,filename($s0)    	# Load character at index
     	addi $s0,$s0,1      		# Increment index
     	bnez $a3,REMOVE_NEWLINE     	# Loop until the end of string is reached
@@ -55,8 +69,8 @@ REMOVE_NEWLINE:
     	sb $0, filename($s0)    	# Add the terminating character in its place
     
 SKIP:
-	#continue to open file
-	j OPENFILE
+	# Return to main
+	jr $ra
 	
 OPENFILE:	
   	# Open a file
@@ -79,15 +93,53 @@ OPENFILE:
   	move $a0, $s6      		# file descriptor to close
   	syscall            		# close file
   	
-  	#
+  	jr $ra
+  	
+ 
+CONTENT:
+	# Display file content
+	la $a0, prompt2
+	li $v0, 4
+	syscall
+
+	# Display file content
+	li $v0, 4
+	la $a0, read
+	syscall
+	
+	#display newline in console
+	la $a0, newline
+	li $v0, 4
+	syscall
+	
+	jr $ra
+
+HASHVALUE:
+
+	# Display hashvalue
+	la $a0, prompt3
+	li $v0, 4
+	syscall
+
+	# Display hashvalue
+	li $v0, 4
+	la $a0, hashvalue
+	syscall
+	
+	#display newline in console
+	la $a0, newline
+	li $v0, 4
+	syscall
+	
+	jr $ra
+
+HASH:
 	
 	#display debug in console
 	la $a0, debug
 	li $v0, 4
 	syscall
 	j END
-
-HASH:
 
 	#modulus value 104729
 	#base value 31
@@ -102,6 +154,8 @@ HASH:
 	li $t1, 24
 	li $t2, 5
 	div $t1, $t2			# store value in Lo and Remainder in Hi 
+	
+	jr $ra
 
 
 END:
