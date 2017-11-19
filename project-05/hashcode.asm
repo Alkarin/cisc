@@ -2,6 +2,10 @@
 # av1045643@swccd.edu
 
 # STRING TO HASCODE
+# TODO: Output resuilt
+# More thorough testing
+# Code cleanup
+# Readability
 
 # Prompt user to input a file name
 # Read file
