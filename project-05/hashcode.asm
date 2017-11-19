@@ -49,6 +49,14 @@ main:
 	
 HASH:
 #do shit
+	li $t1, 4
+	li $t2, 3
+	mult $t1,$t2	#stored in Lo
+	mflo $t0	#stores Lo in $t0
+	
+	li $t1, 24
+	li $t2, 5
+	div $t1, $t2	# store value in Lo and Remainder in Hi 
 	
 OPENFILE:	
 #open a file for writing
