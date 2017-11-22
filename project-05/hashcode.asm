@@ -2,10 +2,7 @@
 # av1045643@swccd.edu
 
 # STRING TO HASCODE
-# TODO: Output resuilt
-# More thorough testing
-# Code cleanup
-# Readability
+# TODO Readability
 
 # Prompt user to input a file name
 # Read file
@@ -15,9 +12,6 @@
 .data  
 
 # give me 100 of 0x0a
-#read: .byte 0x10:80
-#text_buffer: .byte 0x00:100
-
 read: .byte 0x00:100
 filename: .byte 0x00:100		# filename for output
 hashvalue: .byte 0x00:100
@@ -53,7 +47,7 @@ main:
 	jal OPENFILE
 	
 	# Display file content to user
-	jal CONTENT
+	#jal CONTENT			# uncomment to display to user
 
 	# Hash file content
     	la $s0, read     		#s0 text iterating through    	
@@ -127,35 +121,34 @@ CONTENT:
 
 HASH:
 	
-	
 	addi $t5, $zero, 104729		# modulus value
 	addi $t6, $zero, 31		# base value
 	
 	add 	$s1, $s0, $t0		# $s1 = read[i]  			aka *v
     	lb 	$s2, 0($s1)     	# Loading char to hash into $s2		aka *v
-	#############################
+
 
     	beq 	$s2, '\0', exitLoop	# Breaking the loop if we've reached the end
     	beq 	$s2, '\r', loopIterate	# skip carriageReturn
     	beq 	$s2, '\n', loopIterate	# skip newline
 
     	
-    	mult $t6,$t7		# base * hash
-    	add $t4, $zero, $zero	# set temp value
-    	mflo $t4		# put mult product in $t4
-    	add  $t4, $t4, $s2	#  the value to modulus against
+    	mult $t6,$t7			# base * hash
+    	add $t4, $zero, $zero		# set temp value
+    	mflo $t4			# put mult product in $t4
+    	add  $t4, $t4, $s2		#  the value to modulus against
+    		
+    	div $t4,$t5			# 106/104729
+    	mflo $t3			# set $t4 to quotient of division
+    	mult $t3,$t5			# subtract this from $t4
+    	mflo $t2			# value from mult 
     	
-    	div $t4,$t5		# 106/104729
-    	mflo $t3		# set $t4 to quotient of division
-    	mult $t3,$t5		# subtract this from $t4
-    	mflo $t2		# value from mult 
-    	
-    	sub $t4,$t4,$t2		# subtract modulo value from our value	# 106-0 =106
-    	add $t7,$zero,$t4	# place result into hash
-    	################
+    	sub $t4,$t4,$t2			# subtract modulo value from our value	# 106-0 =106
+    	add $t7,$zero,$t4		# place result into hash
+
     	loopIterate:
     	addi 	$t0, $t0, 1    		# increment iterator +1
-    	j HASH    		# continue loop
+    	j HASH    			# continue loop
 	
     	exitLoop:
  	jr $ra				# jump to return address
@@ -163,26 +156,20 @@ HASH:
  	
 HASHVALUE:
 
-	# Display hashvalue
+	# Display hash prompt
 	la $a0, prompt3
 	li $v0, 4
 	syscall
 
 	# Display hashvalue
-	li $v0, 4
-	la $a0, hashvalue
+	li $v0, 1
+	move $a0,$t7			# Take hash value and place in a0 to be displayed
 	syscall
 	
 	#display newline in console
 	la $a0, newline
 	li $v0, 4
 	syscall
-	
-	#display debug in console
-	la $a0, debug
-	li $v0, 4
-	syscall
-	j END
 	
 	jr $ra
 	
